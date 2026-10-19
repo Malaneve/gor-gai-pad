@@ -112,6 +112,28 @@ body.win .score{border-color:var(--win-ink)}
 .ppad{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden;touch-action:none;margin-top:6px}
 .ppad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .ppadtools{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
+.consent{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:19;padding:0 max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.consent>div{max-width:740px;margin:0 auto 8px;background:var(--paper);border:1px solid var(--accent);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);display:grid;gap:8px;font-size:13px}
+.consent .row{display:flex;gap:8px;flex-wrap:wrap}
+.privacy{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:13px;color:var(--muted)}
+.privacy h2{font:600 15px/1.2 var(--f-display);margin:0 0 6px;color:var(--ink)}
+.privacy label{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:14px;margin-top:8px}
+.stats{display:grid;gap:14px}
+.tiles2{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.tile2{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.tile2 b{display:block;font:600 24px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.tile2 span{font-size:12px;color:var(--muted)}
+.sbox{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.sbox h3{font:600 15px/1.2 var(--f-display);margin:0 0 4px}
+.sbox p{margin:0 0 8px;font-size:12px;color:var(--muted)}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:4px 6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td.th{font:400 22px/1 var(--f-letter)}
+.tbl .barcell{width:40%}
+.tbl .bar{height:8px;border-radius:4px;background:var(--accent);min-width:2px}
+.tbl .bar.bad{background:var(--warn)}
 .notes{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
 .notes h2{font:600 15px/1.2 var(--f-display);margin:0 0 6px}
 .notes pre{white-space:pre-wrap;font:13px/1.5 var(--f-body);margin:8px 0;color:var(--muted);max-height:220px;overflow:auto}
@@ -172,6 +194,22 @@ body.win .score{border-color:var(--win-ink)}
       <pre id="notesText"></pre>
       <button class="btn" id="copyNotes">Copy notes</button>
     </div>
+    <div class="privacy" id="privacy">
+      <h2>Privacy</h2>
+      This test version can share anonymous usage to help improve the app: which letters, modes and phrases get used, and whether traces pass. It uses a random device code. No names, nicknames, location or anything you type is shared.
+      <label><input type="checkbox" id="usageChk"> Share anonymous usage</label>
+    </div>
+  </section>
+
+  <section id="vStats" hidden>
+    <div class="boardhead"><h2>Usage stats</h2>
+      <div class="seg" role="group" aria-label="Period"><button data-d="7" aria-pressed="true">7 days</button><button data-d="30" aria-pressed="false">30 days</button></div></div>
+    <form class="join" id="statsLogin" hidden>
+      <h3>Private page</h3>
+      <div class="row"><input id="statsKey" type="password" autocomplete="current-password" placeholder="Stats passphrase" aria-label="Stats passphrase"><button class="btn pri">Open</button></div>
+      <p class="small" id="statsMsg" style="margin:0"></p>
+    </form>
+    <div class="stats" id="statsBody"></div>
   </section>
 
   <section id="vPhrases" hidden>
@@ -242,6 +280,10 @@ body.win .score{border-color:var(--win-ink)}
     </div>
   </section>
 </div>
+<div class="consent" id="consent" hidden><div>
+  <div><b>Help improve this test version?</b> The app can share anonymous usage: which letters and phrases you practise and whether traces pass. No names or personal data. You can change this any time under Privacy on the Letters page.</div>
+  <div class="row"><button class="btn pri" id="consentYes">OK, share</button><button class="btn" id="consentNo">No thanks</button></div>
+</div></div>
 <nav class="tabbar" aria-label="Sections">
   <button data-v="letters"><span class="tg" aria-hidden="true">ก</span>Letters</button>
   <button data-v="phrases"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/></svg>Phrases</button>
@@ -558,6 +600,33 @@ function geom(ch){
   return geo[ch]=strokes;
 }
 
+/* ---------- anonymous usage (sent to Supabase only after the tester says OK) ---------- */
+const APP_VER='20261019171625';
+let curView='',voiceLogged=false,sending=false,sendTimer=0;
+let usageOn=store.get('usage',true),consentSeen=store.get('consent',false),evq=store.get('evq',[]);
+let device=store.get('dev',null);
+if(!device){device=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');store.set('dev',device)}
+const platform=()=>/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)?'ios':/Android/i.test(navigator.userAgent)?'android':'other';
+const installed=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function track(e){
+  if(!usageOn)return;
+  evq.push(Object.assign(e,{t:new Date().toISOString()}));
+  if(evq.length>500)evq=evq.slice(-500);
+  store.set('evq',evq);
+  clearTimeout(sendTimer);sendTimer=setTimeout(sendUsage,8000);
+}
+async function sendUsage(){
+  if(sending||!usageOn||!consentSeen||!evq.length||typeof rpc!=='function')return;sending=true;
+  try{while(evq.length){
+      const batch=evq.slice(0,50);
+      try{await rpc('ggp_log',{p_device:device,p_ver:APP_VER,p_platform:platform(),p_installed:installed(),p_events:batch})}
+      catch(e){if(!e.server||/too many/i.test(e.message))break}   // offline or busy: try later; a bad batch is dropped
+      evq=evq.slice(batch.length);store.set('evq',evq);
+    }}finally{sending=false}
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)sendUsage()});
+addEventListener('online',()=>sendUsage());
+
 /* ---------- speech ---------- */
 let thVoice=null;
 function pickVoice(){const vs=speechSynthesis.getVoices();thVoice=vs.find(v=>/^th(-|_|$)/i.test(v.lang))||null;return thVoice}
@@ -569,7 +638,7 @@ function speak(text,rate){
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);u.lang='th-TH';u.rate=rate;if(pickVoice())u.voice=thVoice;
   speechSynthesis.speak(u);
-  if(!thVoice){msg.hidden=false;msg.textContent=isIOS?"No Thai voice found. On iPhone: Settings › Accessibility › Spoken Content › Voices › Thai, then reopen the app.":"No Thai voice found on this device. On Android: Settings › Text-to-speech output › Google › install Thai, then reload."}
+  if(!thVoice){if(!voiceLogged){voiceLogged=true;track({ev:'voice_missing'})}msg.hidden=false;msg.textContent=isIOS?"No Thai voice found. On iPhone: Settings › Accessibility › Spoken Content › Voices › Thai, then reopen the app.":"No Thai voice found on this device. On Android: Settings › Text-to-speech output › Google › install Thai, then reload."}
   else msg.hidden=true;
 }
 
@@ -621,9 +690,10 @@ function openLetter(i){
 $('#prev').onclick=()=>openLetter(cur-1);
 $('#next').onclick=()=>openLetter(cur+1);
 function setView(v){
-  for(const id of ['vIndex','vLetter','vBoard','vPhrases'])$('#'+id).hidden=id!==v;
+  if(v!==curView){curView=v;track({ev:'view',d:{v:v.slice(1).toLowerCase()}})}
+  for(const id of ['vIndex','vLetter','vBoard','vPhrases','vStats'])$('#'+id).hidden=id!==v;
   $('#lnav').hidden=v!=='vLetter';
-  const tab={vIndex:'letters',vLetter:'letters',vPhrases:'phrases',vBoard:'board'}[v];
+  const tab={vIndex:'letters',vLetter:'letters',vPhrases:'phrases',vBoard:'board',vStats:''}[v];
   document.querySelectorAll('.tabbar button').forEach(b=>b.dataset.v===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 }
 const goHome=()=>{stopWatch();setView('vIndex');try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
@@ -643,6 +713,7 @@ const HINTS={
   book:"Copy the letter along the rows. The guide fades as you go, so the last boxes are all you.",
 };
 function setMode(m){
+  track({ev:'mode',m,l:DATA[cur][0]});
   mode=m;stopWatch();
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.mode===m));
   $('#hint').textContent=HINTS[m];
@@ -655,7 +726,7 @@ function setMode(m){
     tools.append(btn('▶ Play again',()=>playWatch(1)),btn('Slow',()=>playWatch(0.45)));
     playWatch(1);
   }else{
-    tools.append(btn('Undo',()=>{ink.undo();awarded=false;ink.strokes.length?check(false):showResult(null)}),btn('Clear',()=>{ink.clear();awarded=false;showResult(null)}),btn('Show me',demo),btn('Check',()=>check(true),'pri'),penBtn());
+    tools.append(btn('Undo',()=>{ink.undo();awarded=false;logged=false;ink.strokes.length?check(false):showResult(null)}),btn('Clear',()=>{ink.clear();awarded=false;logged=false;showResult(null)}),btn('Show me',demo),btn('Check',()=>check(true),'pri'),penBtn());
     showResult(null);
   }
 }
@@ -683,9 +754,9 @@ function glyphURL(ch){
 }
 const glyphMask=(id,ch)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="90" height="125"><image href="${glyphURL(ch)}" x="0" y="0" width="100" height="130"/></mask>`;
 let watchRaf=0;
-let awarded=false;
+let awarded=false,logged=false;
 function buildPad(){
-  awarded=false;
+  awarded=false;logged=false;
   const ch=DATA[cur][0],g=geom(ch),showGhost=mode!=='memory';
   const svg=$('#padSvg');
   const starts=g.map((s,i)=>`<g class="start"><circle cx="${s.pts[0][0]}" cy="${s.pts[0][1]}" r="2.8" fill="var(--accent)"/>`+(g.length>1?`<text x="${s.pts[0][0]}" y="${s.pts[0][1]+1.3}" font-size="3.6" text-anchor="middle" fill="#1b1300" font-family="sans-serif" font-weight="700">${i+1}</text>`:'')+`</g>`).join('');
@@ -702,6 +773,7 @@ function buildPad(){
 function stopWatch(){cancelAnimationFrame(watchRaf)}
 function demo(){const k=$('#inked');k.setAttribute('opacity',.5);playWatch(1,()=>setTimeout(()=>k.setAttribute('opacity',0),500))}
 function playWatch(speed,onEnd){
+  track({ev:'watch',l:DATA[cur][0]});
   stopWatch();
   const g=geom(DATA[cur][0]);if(!$('#mp0'))buildPad();
   const dot=$('#penDot');
@@ -771,6 +843,7 @@ function check(final){
   if(final&&mode==='memory')$('#ghost').setAttribute('opacity',1);
   if(final){$('#miss').innerHTML=missed.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.1" fill="var(--warn)"/>`).join('')}
   const allOk=good&&startOk&&dirOk&&orderOk;
+  if(!logged){logged=true;track({ev:'trace',l:DATA[cur][0],m:mode,ok:allOk,d:{s:+startOk,r:+dirOk,o:+orderOk,g:+good,c:Math.round(cover*100)}})}
   if(allOk&&!awarded){
     awarded=true;
     const ch=DATA[cur][0],first=!done[ch];
@@ -799,7 +872,7 @@ function celebrate(n,note){
   document.body.classList.add('win');clearTimeout(winTimer);
   const at=cur,inMode=mode;
   winTimer=setTimeout(()=>{document.body.classList.remove('win');pad.querySelectorAll('.pop').forEach(e=>e.remove());
-    if(cur===at&&mode===inMode){ink.clear();awarded=false;showResult(null);$('#hint').textContent="Again! Every clean letter adds to today's score."}},1700);
+    if(cur===at&&mode===inMode){ink.clear();awarded=false;logged=false;showResult(null);$('#hint').textContent="Again! Every clean letter adds to today's score."}},1700);
 }
 function showProgress(c){const r=$('#result');r.hidden=false;r.innerHTML=`<span class="small">Covered so far</span><div class="meter"><i style="width:${Math.round(c*100)}%"></i></div>`}
 function showResult(x){if(!x){$('#result').hidden=true;const m=$('#miss');if(m)m.innerHTML='';if(mode==='memory'&&$('#ghost'))$('#ghost').setAttribute('opacity',0)}}
@@ -872,7 +945,7 @@ $('#joinForm').onsubmit=async e=>{e.preventDefault();
   const bytes=crypto.getRandomValues(new Uint8Array(32)),secret=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
   $('#joinBtn').disabled=true;jm.textContent='Joining…';
   try{const id=await rpc('ggp_register',{p_nickname:nick,p_secret:secret});
-    me={id,secret,nick};store.set('me',me);jm.textContent='';renderBoard()}
+    me={id,secret,nick};store.set('me',me);track({ev:'join'});jm.textContent='';renderBoard()}
   catch(e){jm.textContent=e.server?e.message:offlineMsg()}
   finally{$('#joinBtn').disabled=false}
 };
@@ -908,14 +981,14 @@ function phraseCard(ph){
   for(const [t,rom,kind] of words){
     const w=el('span',{class:'w'+(kind?' '+kind:'')});w.textContent=t;
     if(kind!=='blank'){w.setAttribute('role','button');w.setAttribute('tabindex','0');w.setAttribute('aria-label',`Play ${rom}`);
-      w.onclick=()=>speak(t,0.75);w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();speak(t,0.75)}}}
+      w.onclick=()=>{speak(t,0.75);track({ev:'word_tap',d:{w:t}})};w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();speak(t,0.75)}}}
     th.append(w)}
   const rom=el('div',{class:'prom'});rom.textContent=words.map(w=>w[1]).join(' ');
   const en=el('div',{class:'pen'});en.textContent=ph.en;
   const act=el('div',{class:'pact'});
   const fav=el('button',{class:'btn fav','aria-pressed':String(!!favs[ph.id]),'aria-label':'Favourite'},favs[ph.id]?'★':'☆');
-  fav.onclick=()=>{if(favs[ph.id])delete favs[ph.id];else favs[ph.id]=1;store.set('favs',favs);fav.setAttribute('aria-pressed',String(!!favs[ph.id]));fav.textContent=favs[ph.id]?'★':'☆';if(pgroup==='fav')renderPhrases()};
-  act.append(btn('▶ Play',()=>speak(phraseText(ph),0.85),'pri'),btn('Slowly',()=>speak(phraseText(ph),0.5)),btn('✎ Write it',()=>toggleWrite(card,ph)),fav);
+  fav.onclick=()=>{if(favs[ph.id])delete favs[ph.id];else{favs[ph.id]=1;track({ev:'fav',d:{id:ph.id}})}store.set('favs',favs);fav.setAttribute('aria-pressed',String(!!favs[ph.id]));fav.textContent=favs[ph.id]?'★':'☆';if(pgroup==='fav')renderPhrases()};
+  act.append(btn('▶ Play',()=>{speak(phraseText(ph),0.85);track({ev:'phrase_play',d:{id:ph.id,slow:0}})},'pri'),btn('Slowly',()=>{speak(phraseText(ph),0.5);track({ev:'phrase_play',d:{id:ph.id,slow:1}})}),btn('✎ Write it',()=>{if(card.querySelector('.ppad').hidden)track({ev:'write_open',d:{id:ph.id}});toggleWrite(card,ph)}),fav);
   // letters in this phrase you can open
   const seen=new Set(),let_=el('div',{class:'plet'});
   for(const ch of phraseText(ph)){const i=DATA.findIndex(r=>r[0]===ch);if(i<0||seen.has(ch))continue;seen.add(ch);
@@ -963,10 +1036,61 @@ function toggleWrite(card,ph){
 document.querySelectorAll('.spk .seg button').forEach(b=>b.onclick=()=>{spk=b.dataset.s;store.set('spk',spk);renderPhrases()});
 document.querySelectorAll('.tabbar button').forEach(b=>b.onclick=()=>({letters:goHome,phrases:openPhrases,board:openBoard})[b.dataset.v]());
 
+/* ---------- consent + privacy switch ---------- */
+function showConsent(){$('#consent').hidden=consentSeen}
+$('#consentYes').onclick=()=>{consentSeen=true;usageOn=true;store.set('consent',true);store.set('usage',true);$('#usageChk').checked=true;showConsent();sendUsage()};
+$('#consentNo').onclick=()=>{consentSeen=true;usageOn=false;evq=[];store.set('consent',true);store.set('usage',false);store.set('evq',[]);$('#usageChk').checked=false;showConsent()};
+$('#usageChk').checked=usageOn&&consentSeen;
+$('#usageChk').onchange=e=>{usageOn=e.target.checked;consentSeen=true;store.set('consent',true);store.set('usage',usageOn);if(!usageOn){evq=[];store.set('evq',[])}showConsent();sendUsage()};
+
+/* ---------- private stats page (#stats): summary numbers only, needs the passphrase ---------- */
+let statsDays=7;
+function openStats(){stopWatch();setView('vStats');try{history.replaceState(null,'','#stats')}catch(e){}renderStats()}
+const pct=(a,b)=>b?Math.round(100*a/b)+'%':'–';
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let lastStats=null;
+async function renderStats(){
+  document.querySelectorAll('#vStats .seg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===statsDays));
+  const key=store.get('statsKey',''),body=$('#statsBody');
+  $('#statsLogin').hidden=!!key;if(!key){body.innerHTML='';return}
+  body.innerHTML='<p class="small">Loading…</p>';
+  let S;
+  try{S=await rpc('ggp_stats',{p_key:key,p_days:statsDays})}
+  catch(e){if(e.server&&/passphrase/i.test(e.message)){store.set('statsKey','');$('#statsLogin').hidden=false;$('#statsMsg').textContent='Wrong passphrase.'}
+    body.innerHTML=`<p class="small">${esc(e.server?e.message:offlineMsg())}</p>`;return}
+  lastStats=S;
+  const traces=S.daily.reduce((a,d)=>a+d.traces,0),passes=S.daily.reduce((a,d)=>a+d.passes,0);
+  const tile=(n,l)=>`<div class="tile2"><b>${esc(n)}</b><span>${esc(l)}</span></div>`;
+  const bar=(v,max,bad)=>`<div class="bar${bad?' bad':''}" style="width:${max?Math.round(100*v/max):0}%"></div>`;
+  const table=(head,rows)=>`<div class="tbl"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')||`<tr><td colspan="${head.length}">No data yet.</td></tr>`}</tbody></table></div>`;
+  const PROB={bad_start:'start',bad_dir:'direction',bad_order:'stroke order',bad_shape:'shape'};
+  const hard=S.letters.filter(l=>l.attempts>=3).map(l=>{const fail=l.attempts-l.passes;let top='',topN=0;for(const k in PROB)if(l[k]>topN){topN=l[k];top=PROB[k]}return {...l,fail,rate:fail/l.attempts,top,topN}}).sort((a,b)=>b.rate-a.rate).slice(0,15);
+  const maxDay=Math.max(1,...S.daily.map(d=>d.devices));
+  const phraseName=id=>{const ph=PHRASES.find(x=>x.id===id);return ph?ph.en:id};
+  const maxPlay=Math.max(1,...S.phrases.map(p=>p.plays));
+  const watched=Object.entries(S.watched).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const kv=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`);
+  body.innerHTML=`
+  <div class="tiles2">${tile(S.devices,'testers')}${tile(S.retention.came_back||0,'came back on another day')}${tile(S.retention.avg_days||0,'days active (avg)')}${tile(traces,'traces')}${tile(pct(passes,traces),'traces passed')}${tile(S.joined_board,'joined the board')}${tile(S.voice_missing,'had no Thai voice')}</div>
+  <div class="sbox"><h3>Hardest letters</h3><p>At least 3 attempts. The main problem tells you which check fails most; the same failure for many people may mean the stroke draft is wrong.</p>
+    ${table(['','tries','failed','main problem',''],hard.map(l=>`<tr><td class="th">${esc(l.l)}</td><td>${l.attempts}</td><td>${pct(l.fail,l.attempts)}</td><td>${l.top?esc(l.top)+' ('+pct(l.topN,l.attempts)+')':'–'}</td><td class="barcell">${bar(l.rate,1,true)}</td></tr>`))}</div>
+  <div class="sbox"><h3>Testers per day</h3>${table(['day','testers','traces','passed',''],S.daily.map(d=>`<tr><td>${esc(d.d.slice(5))}</td><td>${d.devices}</td><td>${d.traces}</td><td>${pct(d.passes,d.traces)}</td><td class="barcell">${bar(d.devices,maxDay)}</td></tr>`))}</div>
+  <div class="sbox"><h3>Phrases</h3><p>Plays, how often people chose Slowly, Write-it opens and favourites.</p>${table(['phrase','plays','slow','write','★',''],S.phrases.map(p=>`<tr><td>${esc(phraseName(p.id))}</td><td>${p.plays}</td><td>${pct(p.slow,p.plays)}</td><td>${p.writes}</td><td>${p.favs}</td><td class="barcell">${bar(p.plays,maxPlay)}</td></tr>`))}</div>
+  <div class="sbox"><h3>Most-tapped words</h3><p>Words people tap to hear alone, often the hard ones.</p>${table(['word','taps'],S.words.map(w=>`<tr><td class="th">${esc(w.w)}</td><td>${w.taps}</td></tr>`))}</div>
+  <div class="sbox"><h3>Most-watched letters</h3>${table(['','plays'],watched.map(([l,c])=>`<tr><td class="th">${esc(l)}</td><td>${c}</td></tr>`))}</div>
+  <div class="sbox"><h3>What people use</h3>${table(['screen','opens'],kv(S.views))}${table(['practice mode','uses'],kv(S.modes))}</div>
+  <div class="sbox"><h3>Devices and versions</h3>${table(['device','testers'],kv(S.platforms))}${table(['app version','testers'],kv(S.versions))}</div>
+  <div class="sbox"><h3>Share with Claude</h3><p>Copies these numbers as text to paste into the chat for a written report.</p><button class="btn" id="statsCopy">Copy stats</button></div>`;
+  $('#statsCopy').onclick=e=>{const t='Gor Gai Pad stats, last '+statsDays+' days:\n'+JSON.stringify(lastStats);
+    navigator.clipboard?.writeText(t).then(()=>e.target.textContent='Copied',()=>e.target.textContent='Copy failed').catch(()=>{})};
+}
+$('#statsLogin').onsubmit=e=>{e.preventDefault();const k=$('#statsKey').value.trim();if(!k)return;store.set('statsKey',k);$('#statsMsg').textContent='';renderStats()};
+document.querySelectorAll('#vStats .seg button').forEach(b=>b.onclick=()=>{statsDays=+b.dataset.d;renderStats()});
+
 /* ---------- boot ---------- */
-renderScore();renderIndex();flush();setView('vIndex');
+renderScore();renderIndex();flush();setView('vIndex');showConsent();track({ev:'open'});
 const m=/^#l(\d+)$/.exec(location.hash);
-const boot=()=>{if(location.hash==='#board')openBoard();else if(location.hash==='#phrases')openPhrases();else if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
+const boot=()=>{if(location.hash==='#stats')openStats();else if(location.hash==='#board')openBoard();else if(location.hash==='#phrases')openPhrases();else if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
 (document.fonts?document.fonts.load('100px Sarabun','กขค'):Promise.resolve()).then(boot,boot);
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'))</script></body></html>
