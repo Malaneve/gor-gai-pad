@@ -66,6 +66,23 @@ body.win .score{border-color:var(--win-ink)}
 .tile.obs .g{opacity:.55}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
+.board{list-style:none;margin:0;padding:0;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.board li{display:grid;grid-template-columns:2.6em 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.board li:first-child{border-top:0}
+.board li.me{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.board .rk{font:600 16px/1 var(--f-display);color:var(--muted)}
+.board li:nth-child(-n+3) .rk{color:var(--accent)}
+.board .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .pt{font:600 17px/1 var(--f-display)}
+.boardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 12px}
+.boardhead h2{font:600 20px/1.2 var(--f-display);margin:0}
+.seg{display:inline-grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{border:0;background:none;border-radius:9px;min-height:38px;padding:0 14px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.join{display:grid;gap:8px;margin-bottom:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
+.join h3{font:600 16px/1.2 var(--f-display);margin:0}
+.join .row{display:flex;gap:8px;flex-wrap:wrap}
+.join input{flex:1 1 160px;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:0 12px;font:inherit}
 .notes{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
 .notes h2{font:600 15px/1.2 var(--f-display);margin:0 0 6px}
 .notes pre{white-space:pre-wrap;font:13px/1.5 var(--f-body);margin:8px 0;color:var(--muted);max-height:220px;overflow:auto}
@@ -108,7 +125,7 @@ body.win .score{border-color:var(--win-ink)}
 <div class="wrap">
   <div class="top">
     <button class="brand" id="home" aria-label="All letters"><b>ก</b><span>Gor Gai Pad</span></button>
-    <div class="score" id="score" title="Points today"><b id="scoreToday">0</b><span>today</span><span id="scoreTotal"></span></div>
+    <button class="score" id="score" aria-label="Points today. Open the leaderboard"><b id="scoreToday">0</b><span>today</span><span id="scoreTotal"></span><span aria-hidden="true">🏆</span></button>
     <div class="nav" id="lnav" hidden>
       <button class="iconbtn" id="prev" aria-label="Previous letter">‹</button>
       <button class="iconbtn" id="grid" aria-label="All letters">All</button>
@@ -126,6 +143,22 @@ body.win .score{border-color:var(--win-ink)}
       <pre id="notesText"></pre>
       <button class="btn" id="copyNotes">Copy notes</button>
     </div>
+  </section>
+
+  <section id="vBoard" hidden>
+    <div class="boardhead">
+      <h2>Leaderboard</h2>
+      <div class="seg" role="group" aria-label="Period"><button data-p="day" aria-pressed="true">Today</button><button data-p="week" aria-pressed="false">This week</button></div>
+    </div>
+    <div class="join" id="boardJoin" hidden>
+      <h3>Join the leaderboard</h3>
+      <p class="small" style="margin:0">Pick a nickname. Points you earn from now on count. Only your nickname and points are shared, nothing else.</p>
+      <form class="row" id="joinForm"><input id="joinNick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname"><button class="btn pri" id="joinBtn">Join</button></form>
+      <p class="small" id="joinMsg" style="margin:0"></p>
+    </div>
+    <ol class="board" id="boardList"></ol>
+    <p class="small" id="boardMsg"></p>
+    <p class="small">Today resets at midnight Bangkok time. The week starts on Monday.</p>
   </section>
 
   <section id="vLetter" hidden>
@@ -439,7 +472,7 @@ $('#copyNotes').onclick=e=>{const t=$('#notesText').textContent;
 let cur=0, mode='watch';
 function openLetter(i){
   cur=(i+DATA.length)%DATA.length;
-  $('#vIndex').hidden=true;$('#vLetter').hidden=false;$('#lnav').hidden=false;
+  $('#vIndex').hidden=true;$('#vBoard').hidden=true;$('#vLetter').hidden=false;$('#lnav').hidden=false;
   try{history.replaceState(null,'','#l'+cur)}catch(e){}
   const r=DATA[cur],c=CLS[r[4]];
   $('#lBig').textContent=r[0];$('#lBig').style.color=c.color;
@@ -454,7 +487,7 @@ function openLetter(i){
 }
 $('#prev').onclick=()=>openLetter(cur-1);
 $('#next').onclick=()=>openLetter(cur+1);
-const goHome=()=>{stopWatch();$('#vLetter').hidden=true;$('#vIndex').hidden=false;$('#lnav').hidden=true;try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
+const goHome=()=>{stopWatch();$('#vLetter').hidden=true;$('#vBoard').hidden=true;$('#vIndex').hidden=false;$('#lnav').hidden=true;try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
 $('#home').onclick=goHome;
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderScore()});$('#grid').onclick=goHome;
 $('#sayName').onclick=()=>speak(sname(DATA[cur]),0.85);
@@ -607,6 +640,7 @@ function check(final){
     if(first)n+=10;                                                    // first time ever for this letter
     done[ch]=1;store.set('done',done);
     celebrate(n,first?'New letter!':mode==='memory'?'From memory ×2':'');
+    queuePoints(n,ch,mode);
   }
   const r=$('#result');r.hidden=false;
   r.innerHTML=`<b>${good?(allOk?'Nicely done.':'Good shape, check the notes below.'):'Keep going.'}</b> ${Math.round(cover*100)}% of the letter covered, ${Math.round(onLine*100)}% of your ink on the line.<br>`+
@@ -651,10 +685,63 @@ $('#bookClear').onclick=()=>bookInk.clear();
 $('#bookPen').onclick=()=>{pen=pen==='brush'?'mono':'brush';store.set('pen',pen);$('#bookPen').textContent=penLabel();bookInk.redraw()};
 addEventListener('resize',()=>{if(mode==='book'&&!$('#deskBook').hidden){const c=$('#book').parentElement.clientWidth<480?3:5;if(c!==($('#book').style.gridTemplateColumns.match(/\d+/)||[])[0]*1)buildBook()}});
 
+/* ---------- leaderboard (Supabase). Works in the installed app; the Claude page can't reach outside servers. ---------- */
+const LB={url:'https://jlvkpgofmgjgcrjrquih.supabase.co',key:'sb_publishable_VF_0Ngflr8NBTTw8ED0akw_fb_HDSTC'};
+const APP_URL='https://malaneve.github.io/gor-gai-pad/';
+let me=store.get('me',null),queue=store.get('queue',[]),boardPeriod='day',flushing=false;
+async function rpc(fn,args){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),9000);
+  try{const r=await fetch(`${LB.url}/rest/v1/rpc/${fn}`,{method:'POST',signal:ctl.signal,headers:{apikey:LB.key,'Content-Type':'application/json'},body:JSON.stringify(args)});
+    const body=await r.json().catch(()=>null);
+    if(!r.ok)throw Object.assign(new Error((body&&body.message)||('Error '+r.status)),{server:true});
+    return body}
+  finally{clearTimeout(t)}
+}
+const offlineMsg=()=>"Can't reach the leaderboard right now. It works in the installed app when you're online: "+APP_URL;
+function queuePoints(n,ch,md){if(!me)return;queue.push({p:n,l:ch,m:md});store.set('queue',queue);flush()}
+async function flush(){
+  if(flushing||!me||!queue.length)return;flushing=true;
+  try{while(queue.length){
+      try{await rpc('ggp_add_points',{p_player:me.id,p_secret:me.secret,p_points:queue[0].p,p_letter:queue[0].l,p_mode:queue[0].m})}
+      catch(e){if(!e.server)break;                                   // offline: keep for later
+        if(/too fast/i.test(e.message)){setTimeout(flush,60000);break} // try again in a minute
+        if(/unknown player/i.test(e.message)){me=null;store.set('me',null)}}
+      queue.shift();store.set('queue',queue);
+      if(queue.length)await new Promise(r=>setTimeout(r,3500));
+    }}finally{flushing=false}
+}
+addEventListener('online',flush);
+function openBoard(){stopWatch();$('#vIndex').hidden=true;$('#vLetter').hidden=true;$('#lnav').hidden=true;$('#vBoard').hidden=false;try{history.replaceState(null,'','#board')}catch(e){}window.scrollTo({top:0});renderBoard()}
+async function renderBoard(){
+  $('#boardJoin').hidden=!!me;
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===boardPeriod));
+  const list=$('#boardList'),msg=$('#boardMsg');msg.textContent='Loading…';
+  try{const rows=await rpc('ggp_leaderboard',{p_period:boardPeriod,p_player:me?me.id:null});
+    list.innerHTML='';
+    for(const r of rows){const li=el('li',{class:r.is_me?'me':''});
+      li.append(el('span',{class:'rk'},'#'+r.rank),Object.assign(el('span',{class:'nm'}),{textContent:r.nickname+(r.is_me?' (you)':'')}),el('span',{class:'pt'},String(r.points)));
+      list.append(li)}
+    list.hidden=!rows.length;
+    msg.textContent=rows.length?(queue.length?queue.length+' of your letters are still being sent.':''):(boardPeriod==='day'?'Nobody has scored today yet. Trace a letter to be first.':'Nobody has scored this week yet.');
+  }catch(e){list.hidden=true;msg.textContent=e.server?e.message:offlineMsg()}
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{boardPeriod=b.dataset.p;renderBoard()});
+$('#score').onclick=openBoard;
+$('#joinForm').onsubmit=async e=>{e.preventDefault();
+  const nick=$('#joinNick').value.trim(),jm=$('#joinMsg');
+  if(nick.length<2){jm.textContent='Nickname needs at least 2 characters.';return}
+  const bytes=crypto.getRandomValues(new Uint8Array(32)),secret=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
+  $('#joinBtn').disabled=true;jm.textContent='Joining…';
+  try{const id=await rpc('ggp_register',{p_nickname:nick,p_secret:secret});
+    me={id,secret,nick};store.set('me',me);jm.textContent='';renderBoard()}
+  catch(e){jm.textContent=e.server?e.message:offlineMsg()}
+  finally{$('#joinBtn').disabled=false}
+};
+
 /* ---------- boot ---------- */
-renderScore();renderIndex();
+renderScore();renderIndex();flush();
 const m=/^#l(\d+)$/.exec(location.hash);
-const boot=()=>{if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
+const boot=()=>{if(location.hash==='#board')openBoard();else if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
 (document.fonts?document.fonts.load('100px Sarabun','กขค'):Promise.resolve()).then(boot,boot);
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'))</script></body></html>
