@@ -1,0 +1,660 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gor Gai Pad</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f1417"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&family=Bai+Jamjuree:wght@500;600&display=swap">
+<style>
+/* Layout: a single practice desk. Letter info on top, a lined writing pad below, mode tabs between. Index of letters as its own screen. */
+:root{
+  --bg:#eef2f1; --paper:#ffffff; --ink:#16212a; --muted:#5b6a72; --line:#c4d3db; --line-strong:#8fb0c2;
+  --ghost:#d6dfe3; --accent:#c78800; --accent-soft:#fbefd2; --accent-ink:#6f4b00;
+  --mid:#2b7a68; --high:#a44a24; --low:#4c56a8; --num:#8a4f9e; --ok:#2b7a4b; --warn:#a44a24;
+  --shadow:0 1px 2px rgba(22,33,42,.06),0 6px 20px rgba(22,33,42,.06);
+  --win-bg:#b5ebc4; --win-paper:#d8f6e0; --win-ink:#17733d;
+  --f-display:'Bai Jamjuree','IBM Plex Sans Thai Looped',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans Thai Looped','Noto Sans Thai',system-ui,sans-serif;
+  --f-letter:'Sarabun','Noto Sans Thai Looped',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1417; --paper:#172026; --ink:#e7eef0; --muted:#94a5ad; --line:#2b3a43; --line-strong:#41606f;
+  --ghost:#2a363d; --accent:#f2b630; --accent-soft:#3a2f12; --accent-ink:#f6cf72;
+  --mid:#5cc3aa; --high:#ef8d63; --low:#9aa3f2; --num:#d3a6ea; --ok:#6bd394; --warn:#ef8d63;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); --win-bg:#17603a; --win-paper:#1c7445; --win-ink:#b4f5cb; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1417; --paper:#172026; --ink:#e7eef0; --muted:#94a5ad; --line:#2b3a43; --line-strong:#41606f;
+  --ghost:#2a363d; --accent:#f2b630; --accent-soft:#3a2f12; --accent-ink:#f6cf72;
+  --mid:#5cc3aa; --high:#ef8d63; --low:#9aa3f2; --num:#d3a6ea; --ok:#6bd394; --warn:#ef8d63;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); --win-bg:#17603a; --win-paper:#1c7445; --win-ink:#b4f5cb; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-block:12px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px;transition:background .5s}
+.score{display:flex;align-items:baseline;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 12px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background .5s,border-color .5s}
+.score b{font:600 20px/1 var(--f-display);color:var(--win-ink)}
+.score span{font-size:12px;color:var(--muted)}
+.score.bump b{animation:bump .6s}
+@keyframes bump{30%{transform:scale(1.45)}}
+body,.pad{transition:background-color .5s}
+body.win,body.win .top{background:var(--win-bg)}
+body.win .pad{background:var(--win-paper);border-color:var(--win-ink)}
+body.win .score{border-color:var(--win-ink)}
+.pop{position:absolute;left:50%;top:15%;transform:translate(-50%,-50%);font:600 44px/1 var(--f-display);color:var(--win-ink);pointer-events:none;animation:pop 1.3s ease-out forwards;text-align:center}
+.pop small{display:block;font:500 15px/1.3 var(--f-body);margin-top:6px}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%)}}
+@media (max-width:420px){.brand span{display:none}}
+.brand{font:600 18px/1 var(--f-display);letter-spacing:.01em;display:flex;align-items:baseline;gap:8px;background:none;border:0;padding:6px 0}
+.brand b{font:400 26px/1 var(--f-letter);color:var(--accent)}
+.iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:10px;min-width:44px;height:44px;display:inline-grid;place-items:center;padding:0 12px;font-weight:500}
+.iconbtn[disabled]{opacity:.35;cursor:default}
+.nav{display:flex;gap:6px}
+
+/* index */
+.lede{color:var(--muted);max-width:60ch;margin:0 0 16px}
+.cls{margin:22px 0 8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cls h2{font:600 17px/1.2 var(--f-display);margin:0}
+.cls p{margin:0;color:var(--muted);font-size:13px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;align-self:center}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+.tile{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 4px 6px;display:grid;justify-items:center;gap:0}
+.tile .g{font:400 40px/1.15 var(--f-letter)}
+.tile .n{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tile.done::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.tile.flag::before{content:"";position:absolute;top:6px;left:6px;width:8px;height:8px;border-radius:2px;background:var(--warn)}
+.tile.obs .g{opacity:.55}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.notes{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
+.notes h2{font:600 15px/1.2 var(--f-display);margin:0 0 6px}
+.notes pre{white-space:pre-wrap;font:13px/1.5 var(--f-body);margin:8px 0;color:var(--muted);max-height:220px;overflow:auto}
+
+/* letter */
+.head{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+.head .big{font:400 72px/1 var(--f-letter);grid-row:span 3;padding:0 4px}
+.head .thai{font:500 22px/1.25 var(--f-body)}
+.head .rom{color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;border-radius:999px;padding:2px 10px;border:1px solid var(--line);background:var(--bg);white-space:nowrap}
+.chip.c{color:#fff;border-color:transparent}
+.say{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;grid-column:1/-1}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:10px;min-height:42px;padding:0 14px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#1b1300}
+.btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:14px 0 10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{border:0;background:none;border-radius:9px;min-height:40px;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.hint{font-size:13px;color:var(--muted);margin:0 0 8px;min-height:1.5em}
+.deskrow{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.pad{position:relative;width:min(100%,400px,calc(50vh * 90 / 125));margin-inline:auto;aspect-ratio:90/125;max-width:100%;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;touch-action:none;flex:0 0 auto}
+.pad svg,.pad canvas,.book canvas{position:absolute;inset:0;width:100%;height:100%}
+.pad canvas,.book canvas{touch-action:none}
+.side{flex:1 1 220px;min-width:0;display:grid;gap:10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.result{border-radius:12px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);font-size:14px}
+.result b{font-family:var(--f-display)}
+.meter{height:6px;border-radius:3px;background:var(--ghost);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.flagbox{border-top:1px dashed var(--line);padding-top:10px;font-size:13px;color:var(--muted)}
+.flagbox textarea{width:100%;min-height:64px;margin-top:6px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px;font:inherit;resize:vertical}
+.book{position:relative;display:grid;gap:0;background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);touch-action:none}
+.book svg{display:block;width:100%;height:auto;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.small{font-size:12px;color:var(--muted)}
+@media (max-width:520px){.head .big{font-size:60px}.deskrow{gap:12px}}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}.pop,.score.bump b{animation:none}.pop{opacity:1}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <button class="brand" id="home" aria-label="All letters"><b>ก</b><span>Gor Gai Pad</span></button>
+    <div class="score" id="score" title="Points today"><b id="scoreToday">0</b><span>today</span><span id="scoreTotal"></span></div>
+    <div class="nav" id="lnav" hidden>
+      <button class="iconbtn" id="prev" aria-label="Previous letter">‹</button>
+      <button class="iconbtn" id="grid" aria-label="All letters">All</button>
+      <button class="iconbtn" id="next" aria-label="Next letter">›</button>
+    </div>
+  </div>
+
+  <section id="vIndex">
+    <p class="lede">The 44 Thai consonants, grouped by class, plus the Thai numerals. The class decides a syllable's tone later on, so it's worth learning each letter with its colour. Tap a letter to watch it written, hear its name, and trace it.</p>
+    <div id="classes"></div>
+    <div class="legend"><span><i class="dot" style="background:var(--ok)"></i>Traced well</span><span><i class="dot" style="background:var(--warn);border-radius:2px"></i>You flagged the strokes</span><span>Faded = no longer used</span></div>
+    <div class="notes" id="notes">
+      <h2>Stroke notes for Claude</h2>
+      <p class="small" style="margin:0">The stroke animations are first drafts. When one looks wrong, flag it on the letter's page and say what you see. Your notes collect here, ready to paste back into the chat.</p>
+      <pre id="notesText"></pre>
+      <button class="btn" id="copyNotes">Copy notes</button>
+    </div>
+  </section>
+
+  <section id="vLetter" hidden>
+    <div class="head">
+      <div class="big" id="lBig"></div>
+      <div class="thai" id="lThai"></div>
+      <div class="rom" id="lRom"></div>
+      <div class="chips" id="lChips"></div>
+      <div class="say">
+        <button class="btn pri" id="sayName">▶ Hear the name</button>
+        <button class="btn" id="saySlow">Slowly</button>
+      </div>
+      <div class="small" id="voiceMsg" style="grid-column:1/-1" hidden></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" data-mode="watch" aria-selected="true">Watch</button>
+      <button role="tab" data-mode="trace" aria-selected="false">Trace</button>
+      <button role="tab" data-mode="memory" aria-selected="false">Memory</button>
+      <button role="tab" data-mode="book" aria-selected="false">Copybook</button>
+    </div>
+    <p class="hint" id="hint"></p>
+
+    <div class="deskrow" id="deskSingle">
+      <div class="pad" id="pad">
+        <svg id="padSvg" viewBox="0 0 90 125" aria-hidden="true"></svg>
+        <canvas id="padCanvas"></canvas>
+      </div>
+      <div class="side">
+        <div class="tools" id="tools"></div>
+        <div class="result" id="result" hidden></div>
+        <div class="flagbox">
+          <div style="margin-bottom:6px">Stroke order and loop direction are <b>first drafts</b> for now.</div><label><input type="checkbox" id="flagChk"> The stroke order or shape looks wrong</label>
+          <textarea id="flagNote" placeholder="What's off? e.g. starts at the wrong end, loop goes the other way" hidden></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="deskBook" hidden>
+      <div class="tools" style="margin-bottom:10px"><button class="btn" id="bookClear">Clear page</button><button class="btn" id="bookPen"></button></div>
+      <div class="book" id="book"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// Draft stroke paths in a 90x125 box: baseline y=90, glyph = Sarabun at 100 units centred on x=45.
+// "@cx,cy,ang,cw[,r]" = head loop (default r 4.5) starting at angle ang (deg, 0=right, 90=down), cw 1/0.
+const STROKES = {
+"ก":["M30 87 V56 L25.5 48 Q25.5 42 28.5 39 Q32 35.5 40 34.5 L50 34.3 Q61.5 34.5 62.3 44 V87"],
+"ข":["@26.5,48.5,225,1,6.5 Q20 38 30 33.5 Q42 33 44 42 Q44 50 38.5 60 V78 Q39 87 50 87 Q62.5 87 62.5 77 V32"],
+"ฃ":["@26.5,53,225,1,6 Q20 44 23 38 Q25 33.5 28.5 33.5 L35 40 L41 33.5 Q47.5 34 47.5 42 V50 Q47 56 41.5 62 V78 Q42 87 52 87 Q62.5 87 62.5 77 V32"],
+"ค":["@42,57,135,1,6.5 L26 64 L26 87 L25 72 Q24 62 24 50 Q25 35 44 34.5 Q62.5 35 62.5 47 V87"],
+"ฅ":["@42,59,135,1,6 L26 66 L26 87 L25 74 Q24 64 24 50 Q24.5 37 32 34 L44 43 L57 34 Q62.5 36 62.5 47 V87"],
+"ฆ":["@25,53,225,1,5.5 Q19 44 22 38 Q24 33.5 27.5 33.5 L33 40 L38.5 33.5 Q46 34 46.5 42 V50 Q46 58 39 66 L37 72 @35.5,81,300,1,6 L50 75 L60 76 Q65.5 78 65.5 87 V32"],
+"ง":["@49,41,0,1,5 L56 46 Q56.5 49 56.5 54 V82 Q55 88 50 86 L27 57"],
+"จ":["@35,61,0,0,5.5 Q41 66 42 72 V78 Q43 87 52 87 Q62.5 87 62.5 76 V47 Q62.5 35 44 35 Q25 35 22 45"],
+"ฉ":["@29.5,61,0,0,5.5 Q33 66 32.5 72 V86 L44 77 L60 74 Q62.5 76 62.5 82 Q62 89 57 88 Q51 86 52 81 Q54 76 62.5 76 V47 Q62.5 35 44 35 Q25 35 22 46"],
+"ช":["@26.5,47.5,225,1,6 Q20 38 30 33.5 Q42 33 44 42 Q44 50 38.5 60 V78 Q39 87 50 87 Q62.5 87 62.5 77 V40 L66 29"],
+"ซ":["@26.5,54,225,1,6 Q20 44 23 38 Q25 33.5 28.5 33.5 L35 40 L41 33.5 Q47.5 34 47.5 42 V48 Q47 54 41.5 60 L38.5 68 V78 Q39 87 50 87 Q62.5 87 62.5 77 V44 L66 29"],
+"ฌ":["@19.5,81,300,1,6 L17.5 72 V58 Q17 54 12 50 Q10 42 16 37 Q24 33 32 33.5 Q46 34 46.5 45 V72 @44,81,300,1,5.5 L60 78 L70 78 Q74.5 79 74.5 87 V32"],
+"ญ":["@21,81,300,1,6 L14.5 72 V58 Q14 54 11 50 Q10 42 15 37 Q23 33 32 33.5 Q46 34 46.5 45 V76 Q47 87 58 87 L66 87 Q74.5 87 74.5 77 V32","@52,102,180,1,5 Q47 110 55 111 L66 111 Q74.5 110 74.5 100 V95"],
+"ฎ":["@27,81,300,1,6 L32.5 72 V58 Q32 54 27 50 Q25 42 30 37 Q37 33.5 48 33.5 Q65.5 34 65.5 46 V119","M46.5 97.5 L44.5 104 L42 113 Q40 119.5 32 119.5 Q24 119 23.5 112 Q23 105.5 30 104.5 L38 104.5 Q44 105 49 109 Q54 113 60 115 L64.5 116"],
+"ฏ":["@27,81,300,1,6 L32.5 72 V58 Q32 54 27 50 Q25 42 30 37 Q37 33.5 48 33.5 Q65.5 34 65.5 46 V119","M40.5 96.5 L38.5 102 L36.5 110 Q35 119 29 119 Q22 118.5 22 112 Q22 105.5 28 105 L36 105 Q40 106 42 110 L46.5 120 L53 105.5 L57 112 Q60 114.5 64.5 114.5"],
+"ฐ":["@32.5,63,30,0,6.5 Q38.5 69 39 75 V80 Q39.5 87 48 87 Q59.5 87 59.5 79 V58 Q59 52 52 50 Q40 47.5 30 46.5 Q26 45.5 26 41 Q26.5 36 34 35.5 L54 35.5 Q61 36 62 33 L63.5 31","M39 97.5 L38 104 L37 112 Q36 119 28.5 119.5 Q21 119.5 21 113 Q21 108 27 108 L35 108 Q39.5 108.5 41.5 112 L44.5 119.5 L48.5 116.5 Q51.5 112.5 54.5 115.5 L57 117 Q60.5 117 60.5 113 V106 Q60.5 98.5 56 98.5 Q51.5 98.5 51.5 103 Q51.5 107.5 56 107.5 L60.5 107.5"],
+"ฑ":["@20,51,270,1,6 Q15 42 18 37 Q20 32.5 24 33.5 L30 39 L35 33.5 Q41 34 40 45 L37 55 V87 V68 Q44 60 47 56 L51 45 Q54 34 62 33.5 Q68.5 35 68.5 45 V87"],
+"ฒ":["@31,60,90,1,5.5 Q22 70 17 78 Q13 86 13 76 V45 Q13 33 20 33.5 Q26 34 31 41 Q36 34 42 33.5 Q50 34 50.5 45 V72 @45,81,315,1,5 L70 78 Q74.5 79 74.5 87 V32"],
+"ณ":["@20,81,300,1,6 L14.5 72 V58 Q14 54 11 50 Q10 42 15 37 Q23 33 32 33.5 Q46 34 46.5 45 V80 Q48 78 60 76 Q74.5 74 74.5 66 V32 V80 @69,82,0,1,5.5"],
+"ด":["@43,57,135,0,5.5 Q35 68 31 76 L29.5 87 L27 70 Q24 62 24 52 Q24 35 44 34.5 Q62.5 35 62.5 47 V87"],
+"ต":["@43,57.5,135,0,5.5 Q36 68 30 78 L28 87 L25 72 Q23.5 62 23.5 50 Q24 37 33 34 L44 43 L57 34 Q62.5 36 62.5 47 V87"],
+"ถ":["@35.5,81,200,1,6 L29.5 70 V58 Q29 54 25 50 Q23 42 28 37 Q35 34 46 34 Q62.5 34.5 62.5 46 V87"],
+"ท":["@24.5,42,0,1,5.5 L31 44 Q32.5 48 32.5 56 V87 V70 Q38 66 42 56 L48 40 Q51 33.5 58 33.5 Q65.5 34 65.5 44 V87"],
+"ธ":["M65 30 Q63 34 56 34 L36 34 Q26 34 25 40 Q24 46 32 46 L46 48 Q59.5 50 59.5 58 V78 Q59.5 87 46 87 Q29.5 87 29.5 78 V56"],
+"น":["@26.5,41,0,1,5.5 L32 46 Q32.5 50 32.5 58 V86 L44 78 L60 74 Q65.5 72 65.5 66 V32 V80 @60,82,0,1,5.5"],
+"บ":["@26.5,41,0,1,5.5 L32 46 Q32.5 50 32.5 58 V76 Q33 87 46 87 L52 87 Q65.5 87 65.5 76 V32"],
+"ป":["@26.5,41,0,1,5.5 L32 46 Q32.5 50 32.5 58 V76 Q33 87 46 87 L52 87 Q65.5 87 65.5 76 V8"],
+"ผ":["@31.5,41,180,0,5.5 V86 L44.5 59 L60 84 L65.5 86 V32"],
+"ฝ":["@31.5,41,180,0,5.5 V86 L44.5 59 L60 84 L65.5 86 V8"],
+"พ":["@22,41,0,1,5.5 L29 46 Q29.5 50 29.5 58 V86 L36 68 L49 33 L62 66 L68.5 86 V32"],
+"ฟ":["@22,41,0,1,5.5 L29 46 Q29.5 50 29.5 58 V86 L36 68 L49 33 L62 66 L68.5 86 V8"],
+"ภ":["@26.5,81,330,1,6 L32.5 72 V58 Q32 54 27 50 Q25 42 30 37 Q37 33.5 48 33.5 Q65.5 34 65.5 46 V87"],
+"ม":["@29.5,41,0,1,5.5 L34 45 Q35.5 49 35.5 56 V71 @30,81,315,1,5.5 L50 78 L60 80 Q65.5 81 65.5 87 V32"],
+"ย":["@32,40,180,0,5.5 L27 47 Q26 52 29 55 L44 58 L30 62 Q26.5 66 26.5 72 V78 Q27 87 42 87 L48 87 Q62.5 87 62.5 76 V32"],
+"ร":["@49,80,0,0,5.5 L56.5 76 V60 Q56 50 46 48 L28 46 Q24.5 44 25 40 Q26 34 36 34 L56 34 Q62 34 64 30"],
+"ล":["@34,80,180,1,5.5 L28 76 Q26.5 72 26.5 64 Q27 55 36 53 L56 53 Q62.5 53 62.5 60 V87 V46 Q62.5 35 44 34.5 Q26 35 21 45"],
+"ว":["@52,80,0,0,5.5 L59.5 75 V46 Q59.5 34.5 42 34.5 Q27 35 23 47"],
+"ศ":["@42,57,135,1,6.5 L26 64 L26 87 L25 72 Q24 62 24 50 Q25 35 44 34.5 Q62.5 35 62.5 47 V87","M67 26 Q62 32 60 38 L46 51"],
+"ษ":["@23.5,41,0,1,5.5 L28 46 Q29.5 50 29.5 58 V76 Q30 87 44 87 L52 87 Q65.5 87 65.5 76 V32","@49,56,90,0,5.5 Q56 63 66 61 Q74 59 78 53"],
+"ส":["@34,80,180,1,5.5 L28 76 Q26.5 72 26.5 64 Q27 55 36 54 L56 54 Q62.5 54 62.5 60 V87 V46 Q62.5 35 44 34.5 Q26 35 21 45","M67 26 Q62 32 60 38 L46 52"],
+"ห":["@26.5,41,0,1,5.5 L31 46 Q32.5 50 32.5 58 V86 L42 68 L50 55 L54 50 @62,41,135,1,6 L65.5 56 V87"],
+"ฬ":["@22,41,0,1,5.5 L28 46 Q29.5 50 29.5 58 V86 L38 72 L49.5 54 L60 74 L68.5 86 V50 @62,40,45,0,5.5 L72 30 L76 26"],
+"อ":["@35.5,60,180,0,5.5 L29.5 66 V76 Q30 87 44 87 L50 87 Q62.5 87 62.5 76 V47 Q62.5 34.5 44 34.5 Q26 35 21 45"],
+"ฮ":["@34,62,180,0,5.5 L26.5 68 V76 Q27 87 42 87 L50 87 Q62.5 87 64 76 V36 L66.5 30.5 Q60 33.5 52 33.8 L40 34 Q26 34.5 25.5 40 Q25.5 46 32 46.5 L50 47 L66.5 46.5"],
+// Thai numerals ๐–๙ (drafted from Sarabun, 2-unit grid)
+"๐":["M45 49.5 A23.5 19 0 1 0 45 87.5 A23.5 19 0 1 0 45 49.5"],
+"๑":["@45,69,0,1,6 L50 77 L48.5 83 Q46 86 40 86 L30 86 Q22 85 21.5 74 V64 Q22 50 45 49.5 Q68 50 68.5 64 V82 Q68 88 65 90"],
+"๒":["@40,68.5,225,0,5.5 L34 58 Q34 48 42 47.5 Q50 48 53 57 Q55 47.5 61 47.5 Q68 48 68 56 V78 Q67 88 45 88 Q23 88 21 78 V35 L15 31"],
+"๓":["@30,80,225,1,5 L24 75 Q21 72 21 66 V60 Q22 48 33 48 Q47 48 48 58 V88 V58 Q49 48 60 48 Q70 49 70 60 V88"],
+"๔":["@46,68,0,1,5.5 L52 75 L58 82 Q66 86 76 88.5 L60 86 L35 86 Q23 85 23 74 V62 Q23 54 32 51 L50 48 L68 45.5 Q75 42 77 31"],
+"๕":["@46,68,0,1,5.5 L52 75 L58 82 Q66 86 76 88.5 L60 86 L35 86 Q23 85 23 74 V62 Q23 54 32 51 L44 48 @49,40.5,90,0,5.5 L62 46 Q74 43 77 31"],
+"๖":["@32,75,90,0,5.5 Q34 85 45 86 Q60 87 66 80 L67.5 70 V62 Q67 50 50 49.5 Q35 50 28 55 L25 60 L24 50 L22.5 40 L17 31"],
+"๗":["@28,80,225,1,5.5 L21 74 Q18 70 18 64 V58 Q19 47.5 28 47.5 Q39 48 40 57 V70 V57 Q41 48 50 48 Q60 48 60 57 V78 Q60 87 66 85 Q73 82 74 72 V31"],
+"๘":["@63,72,90,1,5.5 Q60 86 52 86 L47 83 L41 71 L35 80 Q31 86 26 85 Q21 83 21 74 V62 Q22 53 32 50 L50 48 L64 46.5 Q69 44 70 38 V31"],
+"๙":["@39,79,180,1,5 L25 82 Q21 78 21 70 V60 Q22 48 33 48 Q48 48.5 50 57 L52 68 Q56 76 62 81 L70 88","M51 56 Q52 48 57 47.5 Q63 48 66 54 Q70 55 73 50 V31"],
+};
+function expandStroke(s){
+  return s.replace(/@(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),([01])(?:,([\d.]+))?/g,(m,cx,cy,a,cw,rr,off)=>{
+    cx=+cx;cy=+cy;a=+a*Math.PI/180;const r=rr?+rr:4.5;
+    const sx=+(cx+r*Math.cos(a)).toFixed(2), sy=+(cy+r*Math.sin(a)).toFixed(2);
+    const ox=+(cx-r*Math.cos(a)).toFixed(2), oy=+(cy-r*Math.sin(a)).toFixed(2);
+    return `${off===0?'M':'L'}${sx} ${sy} A${r} ${r} 0 1 ${cw} ${ox} ${oy} A${r} ${r} 0 1 ${cw} ${sx} ${sy} `;
+  }).replace(/^\s*L/,'M');
+}
+
+
+// GENERATED by refine.js from strokes.js (auto-centred on Sarabun). Do not edit by hand: edit strokes.js, then re-run refineAll() in study.html.
+const STROKES_CENTRED = {"ก":["M30.0 87.0 L29.2 86.1 L28.1 82.1 L28.3 63.0 L29.7 59.1 L32.4 56.0 L33.1 54.5 L33.2 52.9 L32.6 51.4 L31.5 50.5 L27.2 49.6 L26.1 49.0 L25.5 48.2 L25.4 46.2 L28.3 41.1 L31.6 38.2 L37.7 35.5 L43.5 34.8 L49.5 35.4 L54.6 37.5 L58.4 40.8 L60.8 45.0 L61.8 49.0 L62.2 54.0 L62.3 87.0"],
+"ข":["M21.9 43.9 L22.1 42.6 L22.9 41.7 L25.1 40.9 L31.3 43.4 L33.4 45.9 L34.1 49.3 L33.1 52.7 L31.5 54.4 L28.3 55.7 L24.9 55.5 L22.9 54.6 L21.4 53.1 L20.1 50.3 L20.1 46.2 L23.2 38.3 L25.5 36.5 L28.2 35.3 L30.8 34.6 L34.5 34.4 L40.4 35.5 L43.3 37.2 L44.9 39.0 L46.4 42.4 L46.6 47.0 L45.4 51.2 L40.6 60.2 L39.8 62.6 L39.4 70.5 L39.8 80.2 L42.0 84.1 L46.0 86.6 L51.0 87.4 L56.1 86.7 L58.9 85.4 L60.5 84.0 L62.1 81.4 L62.8 78.4 L62.9 36.3 L62.5 32.0"],
+"ฃ":["M22.3 48.8 L24.8 47.4 L27.7 47.1 L30.6 48.0 L32.2 49.4 L33.3 51.3 L33.7 54.9 L32.2 58.2 L30.3 59.8 L27.9 60.7 L24.2 60.2 L22.1 59.0 L20.2 56.1 L19.5 52.7 L19.7 50.4 L20.7 48.0 L21.5 42.5 L23.4 39.0 L25.1 36.8 L28.1 35.2 L31.7 37.0 L34.7 39.7 L35.4 39.6 L38.3 36.9 L41.1 35.2 L43.6 35.9 L45.5 37.4 L47.2 39.7 L47.9 41.6 L48.3 46.6 L47.1 51.6 L41.7 62.1 L40.4 66.0 L40.0 75.0 L40.5 80.2 L42.5 84.1 L46.2 86.5 L52.3 87.4 L57.3 86.4 L60.1 84.9 L61.6 83.4 L62.9 80.5 L63.5 77.4 L63.7 36.3 L63.0 32.3 L62.5 32.0"],
+"ค":["M37.4 61.6 L36.5 61.0 L36.0 59.1 L36.4 57.2 L37.7 55.0 L40.4 52.6 L44.4 51.8 L47.4 52.6 L50.0 55.1 L50.6 59.0 L49.8 61.5 L48.0 63.6 L44.2 64.7 L40.8 63.8 L38.4 61.2 L36.4 60.5 L35.4 60.9 L33.0 63.6 L31.9 64.2 L27.5 63.8 L26.5 63.9 L26.0 64.5 L26.2 66.4 L27.8 70.4 L28.0 72.4 L27.7 78.5 L26.2 83.5 L26.0 86.6 L26.1 84.6 L27.7 79.5 L28.0 71.3 L25.1 64.5 L23.5 56.6 L23.2 51.6 L24.3 45.6 L27.7 40.5 L30.7 38.0 L34.3 36.3 L38.1 35.3 L43.0 34.8 L48.0 35.0 L52.8 36.2 L56.3 37.8 L59.2 40.1 L62.3 44.9 L63.3 49.9 L63.4 82.9 L62.9 86.9 L62.5 87.0"],
+"ฅ":["M37.8 63.2 L36.7 62.8 L36.3 60.8 L36.7 58.9 L37.7 57.5 L39.2 55.9 L41.0 55.0 L45.0 54.5 L48.0 55.8 L49.7 57.7 L50.5 61.8 L49.5 64.5 L47.3 66.6 L45.9 67.1 L43.1 67.3 L40.6 66.3 L38.3 63.4 L36.4 62.6 L35.5 63.0 L33.1 65.6 L32.0 66.1 L27.6 65.8 L26.0 66.4 L26.2 68.4 L27.9 73.3 L26.0 86.6 L26.1 84.6 L27.4 79.5 L27.9 72.4 L27.4 70.5 L25.3 66.6 L23.5 57.7 L22.9 51.7 L24.1 44.7 L26.9 39.3 L29.6 36.7 L31.6 35.6 L32.9 35.5 L35.6 36.4 L43.5 42.6 L44.3 42.8 L50.3 37.4 L52.1 36.3 L54.1 35.8 L56.4 36.0 L58.9 37.8 L61.1 40.8 L62.3 43.5 L63.5 49.5 L63.7 82.5 L63.0 86.6 L62.5 87.0"],
+"ฆ":["M21.1 49.1 L22.7 47.9 L25.8 47.1 L29.0 48.0 L30.7 49.6 L32.0 53.1 L31.8 55.7 L30.7 58.1 L28.5 59.9 L25.9 60.6 L21.8 59.8 L19.8 58.1 L18.5 55.8 L17.9 50.7 L19.3 47.5 L19.8 42.7 L21.2 39.9 L24.3 36.3 L26.7 35.2 L30.2 37.0 L32.9 39.9 L35.7 37.3 L39.2 35.3 L41.2 35.5 L43.2 36.8 L44.9 38.8 L46.1 41.3 L46.4 47.3 L44.7 52.9 L39.6 63.1 L37.8 70.1 L38.1 71.5 L40.6 72.7 L42.0 74.2 L42.7 79.3 L42.3 82.8 L41.2 84.8 L39.5 86.4 L37.5 87.4 L35.3 87.8 L33.0 87.6 L30.7 86.7 L28.0 84.0 L27.1 81.4 L27.2 78.5 L28.4 75.9 L30.4 73.9 L31.7 73.3 L34.5 73.4 L37.8 75.2 L39.7 75.7 L41.6 75.5 L46.5 73.9 L48.6 74.4 L51.6 75.9 L57.4 79.7 L58.7 79.7 L61.5 78.3 L62.9 78.3 L64.7 81.5 L65.5 86.6 L65.1 70.6 L65.1 36.6 L65.5 32.0"],
+"ง":["M54.0 41.0 L55.5 42.1 L55.7 45.4 L55.0 46.9 L53.7 48.1 L52.1 48.6 L48.8 48.7 L45.8 48.1 L44.5 47.2 L42.5 44.9 L41.6 42.1 L42.0 39.2 L43.4 36.7 L45.6 35.0 L48.2 34.2 L51.0 34.4 L53.5 35.6 L55.5 37.5 L56.6 39.8 L56.8 41.9 L56.0 46.2 L55.9 61.2 L55.9 76.2 L56.4 81.2 L56.0 83.1 L54.9 84.3 L51.0 85.1 L49.4 84.9 L46.2 78.6 L30.6 61.7 L27.0 57.0"],
+"จ":["M40.5 61.0 L40.7 59.9 L40.0 58.0 L37.8 55.7 L34.6 54.9 L31.2 55.6 L28.4 58.1 L27.6 60.6 L27.8 63.4 L29.0 65.8 L32.5 67.9 L35.1 67.9 L38.1 66.0 L39.8 63.4 L40.5 61.4 L43.7 80.9 L45.1 84.4 L48.2 86.7 L52.3 87.4 L56.3 86.6 L59.5 84.3 L60.7 81.7 L61.2 78.0 L61.1 48.2 L60.1 43.0 L58.9 40.8 L57.1 38.9 L53.9 36.8 L49.2 35.2 L43.2 34.9 L38.2 35.2 L34.3 36.2 L30.7 37.9 L27.8 40.2 L25.1 43.6 L22.7 45.4 L22.0 45.0"],
+"ฉ":["M35.0 61.0 L35.4 59.9 L34.1 56.9 L32.3 55.7 L30.2 55.4 L27.1 55.8 L25.2 56.8 L23.7 58.5 L22.9 60.7 L22.9 63.2 L23.8 65.6 L26.9 68.4 L29.7 69.4 L32.5 68.5 L33.4 67.3 L35.0 61.6 L34.5 62.3 L34.3 66.4 L32.5 71.1 L31.9 76.1 L32.6 85.9 L38.1 83.4 L42.1 80.3 L47.6 77.0 L52.4 75.5 L55.0 73.4 L57.1 72.6 L59.4 73.2 L60.2 74.0 L64.5 81.5 L64.6 84.0 L63.3 86.1 L61.2 87.6 L59.0 88.2 L55.9 88.0 L53.9 87.2 L51.6 84.8 L50.0 81.1 L49.8 79.6 L50.7 76.5 L51.7 75.4 L53.2 75.0 L56.2 75.1 L59.6 76.1 L62.5 75.9 L62.1 74.0 L60.0 70.0 L61.6 63.0 L61.5 46.0 L60.8 43.4 L59.0 40.4 L55.4 37.5 L49.9 35.4 L44.9 34.9 L38.9 35.1 L34.1 36.4 L29.7 38.5 L27.5 40.3 L22.8 45.9 L22.0 46.0"],
+"ช":["M22.3 43.3 L22.2 41.7 L24.3 40.8 L25.5 40.9 L31.0 43.6 L32.9 46.0 L33.5 49.3 L32.9 51.7 L30.5 54.7 L28.0 55.7 L25.3 55.7 L22.7 54.8 L20.8 53.1 L19.7 50.8 L19.5 46.0 L23.1 38.2 L24.5 36.8 L27.2 35.4 L29.9 34.6 L33.5 34.3 L39.3 35.3 L42.1 36.8 L43.7 38.3 L45.6 42.4 L45.8 46.9 L44.8 51.0 L40.1 60.0 L39.0 63.5 L38.7 74.5 L39.0 79.4 L41.1 83.7 L44.1 86.0 L50.0 87.3 L56.1 86.7 L59.0 85.5 L61.4 83.4 L62.5 81.5 L63.4 78.4 L63.5 53.3 L62.7 50.2 L59.8 46.3 L59.0 44.4 L59.8 42.5 L64.4 35.7 L65.4 32.9 L66.0 29.0"],
+"ซ":["M22.3 49.8 L24.7 47.8 L26.7 47.2 L28.9 47.5 L31.7 49.4 L33.1 52.4 L33.1 55.7 L32.2 57.7 L29.7 59.9 L26.6 60.7 L23.3 60.1 L20.7 58.0 L19.6 56.0 L19.0 51.1 L20.5 47.3 L21.0 42.4 L22.4 39.6 L24.9 36.7 L27.6 35.3 L30.8 36.6 L34.7 39.7 L35.4 39.6 L37.5 37.5 L41.2 35.5 L42.9 35.7 L44.6 37.0 L46.2 39.0 L47.4 41.7 L47.5 47.7 L46.5 51.5 L42.1 60.3 L39.9 65.8 L39.5 69.5 L39.9 80.1 L42.0 83.9 L46.0 86.5 L52.0 87.4 L55.1 87.2 L58.1 86.3 L60.9 84.5 L62.9 81.8 L63.9 78.5 L64.1 75.4 L63.8 52.3 L62.7 49.3 L60.2 46.4 L59.2 44.1 L60.2 41.9 L63.4 38.4 L65.3 34.8 L66.1 31.8 L66.0 29.0"],
+"ฌ":["M22.5 75.8 L24.0 75.2 L25.4 75.8 L27.8 77.6 L28.6 78.9 L28.7 82.0 L26.6 86.0 L22.9 87.9 L19.3 87.7 L16.4 86.2 L14.3 83.0 L14.0 81.1 L14.3 77.1 L15.6 75.2 L17.7 74.6 L22.3 75.6 L17.8 73.0 L17.0 72.2 L16.3 70.1 L16.8 62.0 L18.0 59.1 L20.8 55.6 L21.1 53.9 L20.8 52.1 L19.8 50.7 L18.4 50.0 L13.8 48.9 L13.5 47.7 L14.1 45.3 L15.5 42.6 L17.7 39.9 L22.7 36.6 L29.1 35.0 L36.7 35.2 L40.2 36.4 L43.3 38.4 L45.8 41.3 L47.2 44.2 L48.4 50.2 L48.4 67.2 L46.8 73.2 L46.8 75.2 L47.8 76.6 L51.8 77.9 L53.1 79.2 L53.7 80.9 L53.7 82.7 L52.8 84.2 L50.3 86.5 L47.6 87.6 L43.8 87.4 L41.7 86.5 L40.1 85.0 L38.9 82.4 L38.9 78.5 L40.5 75.8 L42.5 75.1 L52.4 77.0 L58.5 76.4 L66.3 81.3 L68.5 80.8 L71.2 79.0 L72.0 79.2 L73.6 81.6 L74.5 86.6 L73.7 75.6 L73.6 37.6 L74.5 32.0"],
+"ญ":["M24.0 75.8 L25.4 75.5 L26.6 76.1 L28.8 77.8 L29.5 79.1 L29.7 80.5 L29.2 83.4 L26.7 86.7 L23.1 88.0 L19.6 87.7 L16.7 86.0 L14.9 83.3 L14.4 78.8 L15.2 76.7 L16.0 75.9 L19.3 75.1 L22.4 75.2 L23.8 75.7 L14.5 72.0 L16.0 60.9 L19.5 56.3 L20.3 54.7 L20.4 53.0 L19.8 51.5 L18.5 50.4 L13.4 49.0 L12.5 47.8 L12.6 46.0 L14.1 42.8 L16.4 39.8 L21.1 36.5 L26.7 35.0 L34.3 35.0 L38.7 36.4 L42.3 38.7 L45.1 42.0 L46.7 45.7 L47.6 51.7 L47.6 77.6 L48.2 80.3 L49.5 82.7 L51.4 84.6 L53.8 86.0 L59.6 87.3 L66.6 86.7 L71.6 84.3 L73.9 81.3 L74.7 77.4 L74.5 32.0","M47.0 102.0 L46.6 100.9 L47.0 99.9 L48.2 98.2 L49.1 97.7 L52.1 97.5 L54.7 98.3 L56.5 100.4 L57.1 102.4 L56.6 105.8 L55.5 108.6 L54.4 109.8 L52.9 110.4 L51.3 110.3 L49.9 109.4 L48.3 106.6 L47.0 102.4 L47.2 106.8 L48.1 108.9 L48.9 109.7 L53.0 111.0 L57.0 113.0 L60.1 113.2 L64.2 112.6 L68.9 110.1 L71.0 108.1 L72.5 105.9 L74.7 100.4 L74.9 97.4 L74.5 95.0"],
+"ฎ":["M30.0 75.8 L31.5 75.2 L33.6 76.9 L34.9 79.2 L34.7 81.8 L33.7 84.2 L32.2 86.1 L30.2 87.4 L27.9 88.0 L25.5 87.9 L22.3 86.5 L20.1 83.6 L19.5 79.9 L20.2 77.5 L21.7 75.4 L22.7 74.8 L25.2 74.4 L30.1 75.6 L33.0 71.4 L32.4 62.3 L33.2 59.2 L35.5 55.6 L35.9 54.0 L35.6 52.3 L34.8 51.0 L33.4 50.3 L29.4 49.7 L28.2 48.7 L28.5 44.6 L30.7 41.1 L32.9 38.9 L36.8 36.6 L40.5 35.4 L45.3 34.8 L50.1 35.1 L53.8 36.2 L57.0 37.8 L59.9 40.3 L62.5 44.4 L63.9 51.0 L63.9 109.0 L65.3 115.0 L65.5 119.0","M46.5 97.5 L42.1 111.8 L40.9 114.5 L39.1 116.7 L36.8 118.3 L33.0 119.0 L29.3 118.3 L27.1 116.9 L26.1 115.6 L25.3 113.3 L25.3 110.9 L26.0 108.8 L27.3 107.3 L29.4 105.9 L34.1 104.9 L41.0 105.2 L43.9 106.0 L53.3 111.5 L57.4 114.5 L59.3 115.2 L64.5 116.0"],
+"ฏ":["M30.0 75.8 L31.5 75.2 L33.6 76.9 L34.9 79.2 L34.7 81.8 L33.7 84.2 L32.2 86.1 L30.2 87.4 L27.9 88.0 L25.5 87.9 L22.3 86.5 L20.1 83.6 L19.5 79.9 L20.2 77.5 L21.7 75.4 L22.7 74.8 L25.2 74.4 L30.1 75.6 L33.0 71.4 L32.4 62.3 L33.2 59.2 L35.5 55.6 L35.9 54.0 L35.6 52.3 L34.8 51.0 L33.4 50.3 L29.4 49.7 L28.2 48.7 L28.5 44.6 L30.7 41.1 L32.9 38.9 L36.8 36.6 L40.5 35.4 L45.3 34.8 L50.1 35.1 L53.8 36.2 L57.0 37.8 L59.9 40.3 L62.5 44.4 L63.9 51.0 L63.8 108.0 L65.4 114.0 L65.5 119.0","M40.5 96.5 L37.5 106.0 L37.3 112.1 L34.6 116.8 L33.0 118.2 L30.0 119.2 L26.9 119.2 L23.9 118.0 L22.4 116.4 L21.6 114.3 L21.8 110.1 L22.8 108.3 L24.2 107.0 L28.5 105.7 L35.4 105.2 L38.2 106.0 L39.3 107.4 L39.8 110.4 L43.6 114.1 L46.7 119.6 L49.0 113.0 L52.8 105.9 L53.3 105.9 L53.8 106.8 L54.9 112.1 L56.5 114.1 L59.0 115.0 L64.5 114.5"],
+"ฐ":["M38.1 66.3 L39.0 65.5 L39.4 64.5 L39.5 61.3 L37.6 58.7 L34.0 57.2 L30.4 57.5 L28.1 59.0 L26.2 62.2 L26.2 65.2 L26.9 67.2 L28.3 68.9 L31.3 70.3 L34.5 69.4 L38.1 66.4 L39.2 80.3 L40.2 83.0 L42.1 85.1 L46.5 87.2 L51.6 87.2 L55.4 85.9 L58.3 83.2 L59.4 80.4 L59.8 77.4 L59.9 61.4 L59.4 57.4 L58.0 54.9 L55.1 52.7 L50.0 50.6 L28.7 45.7 L27.2 44.5 L26.8 42.8 L27.7 40.4 L29.4 38.0 L31.5 36.2 L34.3 34.9 L40.4 34.7 L54.4 37.8 L57.7 37.9 L60.0 37.0 L61.9 35.3 L63.8 31.2 L63.5 31.0","M39.0 97.5 L39.1 98.5 L37.6 103.4 L37.3 109.4 L36.2 112.0 L31.1 117.7 L27.6 118.8 L23.9 118.2 L22.3 117.1 L21.2 115.5 L20.8 113.5 L21.1 111.5 L22.2 109.9 L23.8 108.8 L28.6 107.8 L35.6 108.2 L38.3 109.1 L39.5 110.5 L41.1 114.0 L43.1 116.4 L44.3 119.1 L44.9 119.2 L48.8 116.0 L50.5 115.2 L52.0 115.4 L55.1 117.3 L57.4 117.6 L58.5 117.3 L59.4 116.7 L60.4 114.8 L60.3 102.7 L59.5 100.9 L58.1 99.8 L55.5 99.1 L53.7 99.3 L51.9 100.2 L50.6 102.1 L50.3 104.4 L51.3 106.8 L52.2 107.7 L54.6 108.3 L60.5 107.5"],
+"ฑ":["M20.0 45.0 L26.1 48.5 L28.2 51.9 L28.4 55.0 L27.2 57.9 L26.0 59.1 L23.0 60.5 L19.8 60.3 L17.1 58.9 L15.4 56.7 L14.5 54.3 L14.5 51.3 L15.5 47.8 L17.4 45.7 L19.7 44.8 L17.7 42.7 L17.4 40.9 L18.0 39.2 L19.8 37.2 L21.5 35.9 L23.8 35.3 L26.9 36.5 L30.0 39.0 L33.0 36.5 L35.7 35.3 L36.9 35.4 L38.5 36.0 L40.2 37.4 L42.0 40.3 L42.6 44.9 L41.9 49.2 L36.7 61.0 L35.0 67.1 L34.6 78.3 L36.8 83.1 L37.0 86.9 L36.8 83.0 L34.9 79.2 L34.5 77.0 L35.0 67.1 L36.2 63.0 L37.1 62.0 L38.6 61.6 L45.8 63.0 L46.7 62.8 L55.2 40.8 L56.8 37.8 L58.5 36.0 L61.6 34.9 L64.1 35.1 L66.7 36.5 L68.2 39.2 L68.6 42.2 L68.5 87.0"],
+"ฒ":["M31.0 65.5 L30.0 65.5 L27.3 64.2 L25.7 61.6 L25.4 59.6 L25.7 57.5 L27.5 54.7 L29.5 53.5 L32.0 53.1 L35.7 54.2 L38.1 57.4 L38.4 60.1 L37.8 62.7 L34.4 66.9 L32.1 67.8 L30.3 67.5 L31.1 68.5 L31.2 69.8 L29.4 73.2 L27.9 74.6 L24.3 75.9 L22.6 75.9 L18.5 74.1 L17.5 74.2 L16.9 75.1 L16.5 78.3 L15.8 80.1 L14.4 81.5 L13.6 81.1 L13.5 79.2 L15.4 75.2 L15.8 73.2 L11.9 54.2 L11.9 49.2 L13.2 44.2 L14.6 41.4 L16.7 38.5 L19.0 36.4 L21.0 35.5 L22.8 35.5 L27.9 38.2 L30.8 40.8 L32.9 39.2 L36.8 38.0 L40.5 35.7 L42.7 35.8 L45.0 37.3 L46.8 39.3 L49.0 43.2 L49.9 46.0 L50.4 51.0 L50.8 71.0 L49.2 75.8 L49.0 77.6 L52.7 81.3 L53.4 83.0 L53.3 84.9 L52.4 86.4 L49.1 87.7 L44.6 86.9 L42.0 84.8 L41.2 83.1 L40.7 80.5 L41.3 77.7 L42.6 76.1 L44.6 75.6 L49.3 77.4 L53.3 77.6 L59.2 75.9 L61.4 76.5 L68.1 81.3 L69.1 81.6 L71.6 80.7 L73.0 80.9 L73.9 82.4 L74.5 86.6 L74.9 76.6 L74.9 37.6 L74.5 32.0"],
+"ณ":["M23.0 75.8 L24.5 75.2 L25.9 75.7 L28.5 77.5 L29.3 78.9 L29.6 80.5 L29.0 83.6 L27.3 86.1 L26.1 87.0 L22.2 88.0 L18.7 87.3 L16.2 85.5 L14.5 82.1 L14.4 78.0 L15.3 76.1 L16.2 75.4 L18.3 75.0 L21.4 75.2 L22.8 75.7 L14.5 72.0 L15.6 62.0 L16.4 60.0 L20.0 55.2 L20.3 53.4 L19.8 51.7 L18.6 50.5 L13.2 49.3 L12.6 48.7 L12.4 47.0 L14.2 43.0 L17.5 39.2 L20.3 37.2 L23.8 35.8 L27.5 35.0 L31.4 34.8 L35.2 35.2 L37.9 35.9 L41.0 37.6 L42.8 39.2 L45.7 43.8 L46.8 49.6 L47.0 71.6 L46.5 79.6 L47.8 79.0 L48.8 79.2 L52.1 81.1 L54.4 81.5 L57.8 78.8 L71.4 71.7 L72.5 70.2 L74.4 64.9 L74.8 61.9 L74.9 40.9 L74.5 32.1 L74.9 39.1 L74.9 61.1 L74.3 65.1 L72.3 70.2 L72.9 72.3 L78.1 77.7 L78.8 80.1 L78.4 82.6 L77.1 85.2 L74.7 87.2 L72.0 88.0 L69.6 87.8 L67.7 87.1 L65.4 85.4 L63.1 80.8 L62.7 78.3 L64.0 75.9 L66.4 74.2 L69.3 73.0 L72.7 73.2 L75.9 74.9 L76.8 76.5 L77.1 78.3 L76.4 81.8 L74.5 82.0"],
+"ด":["M39.1 60.9 L39.6 61.9 L42.7 64.2 L45.5 64.7 L48.0 63.4 L49.4 60.9 L50.1 58.3 L49.8 55.7 L48.7 53.6 L46.9 52.0 L44.8 51.3 L42.6 51.2 L39.7 52.4 L38.2 53.8 L37.3 55.7 L37.1 58.9 L37.8 60.6 L42.1 64.7 L43.0 66.3 L42.9 70.0 L41.9 71.7 L40.2 73.2 L37.7 74.2 L35.0 74.5 L32.4 74.0 L28.8 72.3 L28.0 72.3 L28.0 74.7 L30.2 80.3 L29.5 86.8 L29.5 81.8 L28.4 77.9 L27.3 69.9 L24.5 58.3 L23.8 52.4 L23.9 49.3 L24.6 46.4 L26.4 42.8 L28.2 40.6 L31.2 38.2 L34.7 36.4 L39.4 35.1 L44.4 34.8 L48.3 35.1 L53.1 36.4 L56.4 38.2 L59.1 40.6 L61.3 44.5 L62.8 51.2 L62.9 82.2 L62.5 87.0"],
+"ต":["M39.1 61.4 L41.4 65.0 L44.1 66.4 L45.7 66.2 L47.1 65.4 L49.0 62.9 L49.9 60.1 L49.8 57.5 L48.8 55.3 L47.2 53.8 L45.4 52.9 L42.7 52.7 L40.1 53.5 L38.6 54.6 L37.2 57.3 L37.0 60.4 L38.2 62.7 L41.8 66.0 L42.7 67.7 L42.8 69.5 L42.3 70.9 L41.2 72.1 L38.4 74.8 L36.4 76.0 L34.1 76.6 L31.9 76.3 L28.8 74.8 L27.9 74.8 L27.8 77.0 L29.1 81.4 L27.9 86.7 L26.9 80.8 L27.3 75.7 L27.0 72.7 L23.6 58.1 L23.0 53.1 L23.6 46.1 L26.0 40.6 L29.6 36.1 L33.0 34.0 L43.8 42.8 L44.6 42.6 L50.7 37.3 L56.9 34.0 L57.8 34.4 L62.1 43.0 L63.6 49.9 L63.7 82.9 L63.0 87.0 L62.5 87.0"],
+"ถ":["M29.9 78.9 L28.5 77.1 L31.2 74.5 L33.6 73.6 L36.3 73.6 L38.6 74.5 L40.4 76.0 L41.6 77.9 L42.1 80.1 L41.7 83.4 L40.6 85.4 L39.0 86.9 L36.9 87.8 L34.5 88.1 L32.1 87.7 L29.8 86.5 L28.1 84.5 L27.1 81.9 L26.9 79.4 L27.2 77.2 L28.6 73.6 L27.8 68.7 L28.1 62.7 L29.1 59.7 L32.4 55.4 L32.8 53.7 L32.5 52.0 L31.5 50.8 L27.3 49.7 L25.5 48.8 L25.1 47.0 L25.5 45.2 L28.9 40.3 L34.9 36.4 L41.6 34.9 L49.4 35.3 L53.9 37.0 L57.3 39.4 L60.2 43.1 L61.6 46.6 L62.4 52.5 L62.5 87.0"],
+"ท":["M30.0 42.0 L31.3 43.1 L31.5 46.1 L30.7 47.5 L28.1 48.8 L22.8 48.6 L20.5 47.6 L18.7 45.9 L17.3 42.3 L17.4 39.7 L18.5 37.2 L20.6 35.3 L23.2 34.4 L26.0 34.3 L28.7 35.3 L30.9 37.2 L32.1 39.5 L31.3 76.1 L32.4 81.1 L32.5 86.9 L32.9 82.0 L31.3 76.0 L31.9 66.9 L32.3 66.2 L33.1 66.2 L36.0 67.4 L38.0 67.8 L40.1 67.4 L41.7 66.4 L42.6 65.0 L51.3 40.8 L53.7 37.1 L55.6 35.7 L58.9 35.0 L61.5 35.4 L64.0 36.9 L65.4 39.5 L66.1 44.6 L66.2 82.6 L65.5 87.0"],
+"ธ":["M65.0 30.0 L65.1 31.3 L63.5 35.1 L62.6 36.2 L60.2 37.7 L56.6 38.1 L43.4 35.2 L36.4 35.1 L33.5 36.0 L31.3 37.6 L27.5 42.6 L27.5 43.9 L28.3 45.1 L31.7 47.3 L44.5 49.7 L51.8 51.6 L55.9 53.2 L58.8 55.6 L59.7 57.3 L60.3 60.3 L60.3 77.4 L59.4 81.4 L56.7 84.5 L54.0 86.0 L51.1 86.9 L42.0 87.3 L36.1 86.1 L31.9 83.4 L30.7 81.9 L29.8 79.1 L29.5 56.0"],
+"น":["M32.0 41.0 L32.9 42.1 L33.2 43.5 L32.2 46.0 L29.9 47.3 L24.5 48.5 L21.8 47.7 L19.6 45.7 L18.8 44.4 L18.2 41.4 L19.5 37.3 L21.5 35.3 L24.0 34.3 L27.8 34.4 L30.1 35.3 L31.8 37.0 L33.0 39.1 L33.5 42.4 L32.4 48.4 L32.5 85.4 L32.8 85.8 L35.4 84.3 L39.5 83.1 L45.1 79.5 L55.1 75.2 L58.5 72.8 L62.1 70.9 L64.5 65.5 L65.0 62.5 L65.5 32.5 L65.0 62.5 L64.5 65.5 L62.8 69.5 L62.8 70.5 L63.8 72.6 L68.2 77.3 L69.0 79.4 L68.9 81.7 L68.0 84.2 L66.2 86.4 L63.8 87.6 L60.2 87.9 L58.2 87.3 L55.8 85.4 L54.8 83.8 L53.7 79.3 L54.3 76.5 L56.2 74.0 L59.3 73.1 L62.5 73.4 L65.6 74.7 L66.9 75.8 L67.8 77.2 L67.9 78.9 L67.0 82.1 L65.5 82.0"],
+"บ":["M32.0 41.0 L32.7 43.5 L32.0 45.9 L29.9 47.5 L24.5 48.6 L21.6 47.9 L19.3 45.9 L18.5 44.5 L17.9 41.5 L18.5 38.4 L19.2 37.1 L21.4 35.2 L24.0 34.3 L26.6 34.2 L28.9 34.9 L30.8 36.3 L32.6 39.2 L33.1 42.4 L32.1 47.4 L32.1 76.5 L32.6 79.5 L33.5 81.4 L34.7 83.0 L37.1 84.8 L41.7 86.7 L49.7 87.4 L56.6 86.5 L60.2 85.0 L62.6 83.3 L64.4 81.0 L65.3 78.2 L65.5 32.0"],
+"ป":["M32.0 41.0 L32.6 44.7 L31.2 46.9 L28.7 47.9 L24.5 48.6 L23.0 48.5 L20.2 47.2 L18.2 44.7 L17.4 41.5 L17.6 39.9 L18.9 37.0 L21.2 35.0 L23.9 34.2 L26.5 34.3 L28.8 35.1 L30.5 36.5 L32.2 39.3 L32.6 41.4 L31.6 54.4 L31.6 76.5 L32.2 79.6 L33.2 81.5 L35.3 83.8 L38.8 85.8 L42.7 86.8 L46.7 87.3 L52.7 87.2 L56.6 86.5 L60.3 85.1 L63.5 82.8 L65.2 80.3 L65.9 76.3 L65.9 12.3 L65.5 8.0"],
+"ผ":["M26.0 41.0 L24.9 42.1 L24.6 43.6 L25.5 46.3 L28.0 47.7 L33.4 48.6 L36.1 47.5 L38.1 45.5 L39.3 41.4 L38.7 38.7 L37.3 36.4 L35.1 34.9 L32.7 34.2 L30.2 34.3 L27.8 35.2 L25.9 36.8 L24.6 39.0 L24.2 43.5 L25.9 49.5 L25.1 54.4 L25.1 74.4 L26.0 85.4 L26.2 85.6 L29.2 81.6 L33.9 77.6 L40.0 68.4 L42.2 62.6 L44.3 59.2 L46.4 62.2 L49.4 68.6 L59.1 82.5 L61.2 84.4 L65.0 85.8 L65.5 85.6 L65.5 82.6 L64.4 74.6 L64.4 36.5 L65.0 32.5 L65.5 32.0"],
+"ฝ":["M26.0 41.0 L24.9 42.1 L24.6 43.6 L25.5 46.3 L28.0 47.7 L33.4 48.6 L36.1 47.5 L38.1 45.5 L39.3 41.4 L38.7 38.7 L37.3 36.4 L35.1 34.9 L32.7 34.2 L30.2 34.3 L27.8 35.2 L25.9 36.8 L24.6 39.0 L24.2 43.5 L25.9 49.5 L25.1 54.4 L25.1 74.4 L26.0 85.4 L26.2 85.6 L29.2 81.6 L33.9 77.6 L40.0 68.4 L42.2 62.6 L44.3 59.2 L46.4 62.2 L49.4 68.6 L59.1 82.5 L61.2 84.4 L65.0 85.8 L65.5 85.6 L65.4 80.6 L64.4 74.6 L64.3 13.6 L65.0 8.5 L65.5 8.0"],
+"พ":["M27.5 41.0 L28.6 42.1 L28.9 43.6 L27.9 46.2 L25.5 47.6 L20.1 48.7 L18.7 48.3 L16.3 46.7 L14.6 44.3 L14.1 41.4 L14.6 38.6 L16.2 36.4 L18.3 34.9 L20.8 34.2 L23.3 34.3 L25.6 35.2 L27.5 36.8 L28.8 38.9 L29.2 41.1 L28.5 54.2 L28.3 73.2 L29.4 79.2 L29.6 85.8 L31.1 80.0 L35.7 74.2 L45.3 43.6 L48.2 39.4 L48.4 35.2 L48.9 33.3 L49.6 34.6 L49.7 38.8 L52.4 43.2 L61.8 73.8 L62.8 75.8 L66.4 79.6 L68.5 85.8 L67.9 80.8 L69.4 72.8 L69.3 36.8 L68.5 32.0"],
+"ฟ":["M27.5 41.0 L28.6 42.1 L28.9 43.6 L27.9 46.2 L25.5 47.6 L20.1 48.7 L18.7 48.3 L16.3 46.7 L14.6 44.3 L14.1 41.4 L14.6 38.6 L16.2 36.4 L18.3 34.9 L20.8 34.2 L23.3 34.3 L25.6 35.2 L27.5 36.8 L28.8 38.9 L29.2 41.1 L28.5 54.2 L28.3 73.2 L29.4 79.2 L29.6 85.8 L31.1 80.0 L35.7 74.2 L45.3 43.6 L48.2 39.4 L48.4 35.2 L48.9 33.3 L49.6 34.6 L49.7 38.8 L52.4 43.2 L61.8 73.8 L62.8 75.8 L66.4 79.6 L68.5 85.8 L67.9 80.8 L69.4 72.8 L69.3 12.8 L68.5 8.0"],
+"ภ":["M31.7 78.0 L33.0 78.5 L33.5 79.6 L34.2 82.1 L34.1 83.4 L31.7 86.4 L28.4 87.9 L24.9 87.8 L21.8 86.2 L20.3 84.4 L19.3 81.0 L19.6 78.6 L20.6 76.4 L23.5 74.0 L24.7 73.8 L27.1 74.2 L31.7 77.7 L32.8 70.8 L32.1 64.8 L32.2 61.8 L33.1 58.8 L35.5 55.3 L35.7 53.6 L35.3 51.9 L34.2 50.7 L28.8 49.7 L28.0 49.1 L27.4 47.6 L28.1 44.9 L31.7 39.9 L37.3 36.4 L43.8 34.9 L51.6 35.4 L55.9 37.1 L59.2 39.5 L61.7 42.7 L63.3 46.5 L64.1 53.5 L64.1 82.5 L64.9 86.6 L65.5 87.0"],
+"ม":["M35.0 41.0 L35.6 44.7 L34.1 46.9 L31.7 47.9 L27.5 48.6 L24.6 47.9 L22.3 45.9 L21.0 43.0 L21.0 39.9 L21.5 38.5 L23.2 36.1 L27.0 34.3 L29.5 34.3 L31.9 35.0 L33.8 36.3 L35.1 38.2 L36.0 42.6 L35.0 48.2 L35.0 72.1 L35.4 73.9 L37.6 75.9 L38.1 78.3 L36.3 84.1 L34.7 86.0 L32.5 87.2 L30.1 87.8 L27.6 87.7 L25.1 86.7 L23.1 84.8 L21.6 80.6 L22.1 77.6 L22.7 76.2 L23.7 74.9 L26.3 73.2 L31.3 72.2 L34.8 72.9 L36.0 73.7 L37.1 75.8 L38.2 76.6 L42.2 75.8 L44.2 76.3 L53.7 80.9 L57.8 84.0 L60.5 84.0 L62.9 82.1 L63.5 82.0 L65.0 84.1 L65.5 86.9 L65.3 82.9 L63.9 76.9 L63.8 37.9 L64.2 34.8 L65.5 32.0"],
+"ย":["M26.5 40.0 L26.0 41.1 L26.2 43.5 L27.9 45.2 L33.8 46.8 L36.8 46.6 L39.5 45.0 L41.2 42.2 L41.3 38.8 L39.7 35.9 L37.1 34.2 L34.4 33.8 L31.0 34.5 L28.6 36.2 L27.1 38.6 L26.5 40.5 L26.6 44.4 L25.9 49.4 L28.0 54.3 L34.1 58.9 L36.2 59.3 L40.6 57.7 L43.5 57.9 L39.6 59.2 L33.6 59.9 L28.4 64.5 L27.1 67.2 L26.7 71.1 L26.9 77.1 L28.0 80.6 L31.0 83.9 L36.2 86.4 L44.1 87.4 L51.1 86.7 L55.7 85.0 L58.7 83.0 L60.3 80.9 L61.6 77.6 L61.9 36.7 L62.5 32.0"],
+"ร":["M54.5 80.0 L55.6 78.9 L55.9 77.4 L55.6 76.0 L54.9 74.8 L52.3 73.6 L47.3 73.5 L45.0 74.4 L43.0 76.0 L41.8 78.3 L41.4 81.0 L42.1 83.7 L43.8 86.0 L47.7 87.8 L51.9 87.4 L54.3 85.8 L56.0 83.6 L56.5 81.2 L56.4 73.0 L55.7 68.0 L55.5 58.2 L54.6 55.5 L52.0 53.2 L47.5 51.1 L30.5 46.4 L28.6 44.9 L28.3 43.2 L28.8 41.6 L31.7 37.9 L34.5 35.8 L36.4 35.1 L42.5 35.1 L53.5 37.7 L56.8 37.8 L60.0 35.7 L63.7 31.0 L64.0 30.0"],
+"ล":["M28.5 80.0 L27.4 78.9 L27.1 77.4 L27.4 76.0 L28.1 74.8 L30.7 73.6 L35.7 73.4 L38.0 74.3 L40.0 75.9 L41.3 78.3 L41.7 81.0 L41.0 83.8 L39.2 86.1 L35.3 87.9 L32.5 87.7 L29.8 86.6 L27.2 83.5 L26.5 79.8 L27.5 74.6 L27.3 67.7 L27.7 63.8 L29.4 59.8 L32.2 57.0 L36.6 54.6 L42.4 53.5 L49.4 54.2 L55.4 56.8 L56.4 56.9 L59.2 55.6 L60.7 55.3 L61.4 56.7 L61.3 60.5 L62.2 64.4 L62.5 86.5 L62.2 65.5 L61.4 60.5 L62.3 55.5 L62.0 45.6 L60.1 41.4 L56.2 37.8 L50.8 35.6 L44.9 34.8 L38.0 35.2 L32.3 36.8 L28.2 39.4 L24.5 43.5 L21.9 45.0 L21.0 45.0"],
+"ว":["M57.5 80.0 L58.6 78.9 L58.9 77.4 L58.8 75.9 L58.0 74.6 L55.4 73.4 L50.4 73.5 L48.0 74.4 L46.1 76.0 L44.8 78.3 L44.5 81.0 L45.9 84.9 L48.0 86.8 L50.7 87.8 L53.6 87.8 L56.2 86.8 L58.3 84.8 L59.5 82.4 L58.7 47.0 L57.4 42.6 L55.0 39.2 L51.3 36.6 L47.6 35.3 L42.7 34.8 L37.8 35.3 L34.1 36.5 L30.8 38.5 L28.2 41.1 L25.7 45.0 L23.6 47.1 L23.0 47.0"],
+"ศ":["M37.4 61.6 L36.6 61.0 L36.2 59.0 L37.4 55.7 L39.2 53.4 L41.9 51.7 L43.6 51.2 L45.4 51.6 L47.3 52.6 L49.9 55.1 L50.7 57.6 L49.8 61.6 L48.0 63.6 L45.5 64.6 L43.0 64.6 L40.8 63.8 L37.4 60.8 L36.3 60.5 L35.2 60.8 L31.8 64.2 L26.5 63.9 L26.0 64.5 L26.0 65.5 L27.9 70.4 L28.1 72.4 L27.7 78.5 L26.2 83.5 L26.0 86.6 L26.1 84.6 L27.7 79.5 L28.1 71.3 L27.5 69.3 L25.3 65.5 L23.7 57.6 L23.2 51.6 L24.4 45.6 L25.8 42.9 L27.7 40.6 L30.7 38.0 L34.3 36.3 L38.1 35.3 L42.0 34.8 L48.0 35.1 L54.7 36.5 L57.5 37.7 L59.8 39.6 L61.7 43.0 L63.3 49.9 L63.4 82.9 L62.9 86.9 L62.5 87.0","M67.0 26.0 L66.7 27.0 L62.4 31.4 L59.2 38.7 L48.8 46.7 L47.4 48.3 L46.0 51.0"],
+"ษ":["M29.0 41.0 L30.5 42.1 L30.8 43.7 L30.6 45.2 L29.8 46.6 L27.2 48.1 L23.0 48.7 L20.3 48.2 L18.0 46.4 L16.6 44.1 L16.2 41.4 L16.7 38.8 L18.0 36.6 L20.0 35.1 L22.4 34.3 L24.9 34.3 L27.3 35.0 L29.4 36.6 L30.8 38.9 L31.6 44.1 L30.0 48.3 L30.7 53.0 L30.6 76.1 L30.9 78.9 L32.0 81.4 L35.2 84.5 L41.6 86.8 L49.6 87.3 L56.5 86.5 L60.2 85.0 L62.5 83.4 L64.4 81.1 L65.3 78.3 L65.5 32.0","M49.0 61.5 L50.2 62.1 L52.7 59.1 L53.8 55.7 L53.4 52.8 L52.3 51.0 L50.5 49.7 L48.1 49.2 L45.5 49.7 L43.4 51.1 L42.0 53.4 L41.7 56.1 L42.5 58.5 L44.0 60.5 L46.0 61.9 L50.1 63.1 L55.2 65.3 L58.6 64.8 L63.4 61.7 L71.2 59.6 L72.9 58.5 L78.0 53.0"],
+"ส":["M28.5 80.0 L27.4 78.9 L27.1 77.4 L27.4 76.0 L28.1 74.8 L30.7 73.6 L35.7 73.4 L39.1 75.0 L40.8 77.0 L41.6 79.6 L41.5 82.4 L39.2 86.1 L35.3 87.9 L32.5 87.7 L29.8 86.6 L27.2 83.5 L26.5 79.8 L27.5 74.6 L27.6 64.8 L29.3 60.7 L32.4 57.5 L35.3 55.8 L43.0 53.2 L48.9 54.6 L55.2 57.0 L57.5 56.9 L60.6 55.8 L61.6 57.0 L61.3 60.8 L62.2 65.8 L62.5 86.8 L62.2 66.2 L61.4 61.2 L62.3 56.2 L62.2 48.2 L61.3 42.4 L60.8 40.6 L59.6 39.0 L55.4 36.5 L46.6 34.9 L39.6 34.9 L35.7 35.6 L31.1 37.4 L27.2 40.2 L24.3 43.7 L21.7 45.3 L21.0 45.0","M67.0 26.0 L66.6 27.0 L62.3 31.3 L60.3 37.1 L59.2 38.7 L57.0 40.7 L52.5 43.2 L47.7 47.1 L45.7 50.9 L46.0 52.0"],
+"ห":["M32.0 41.0 L32.9 42.1 L33.2 43.5 L32.2 46.0 L29.9 47.3 L24.5 48.5 L23.1 48.3 L20.6 46.8 L18.9 44.4 L18.3 41.4 L19.6 37.3 L21.6 35.4 L24.0 34.4 L27.8 34.4 L30.1 35.3 L31.9 36.9 L33.0 39.1 L33.5 43.8 L32.0 48.3 L32.6 53.2 L32.6 85.8 L35.6 80.7 L38.9 78.1 L40.2 76.4 L49.3 59.8 L54.0 52.3 L55.5 48.4 L57.7 45.2 L55.5 42.8 L54.3 40.7 L54.4 38.1 L55.0 36.9 L58.1 34.7 L61.5 34.2 L64.7 35.1 L67.0 37.2 L67.9 39.0 L68.3 42.1 L67.9 44.2 L66.7 46.0 L64.8 47.0 L62.7 47.2 L59.8 46.6 L58.1 45.6 L59.8 48.1 L63.4 51.7 L64.8 56.5 L65.5 87.0"],
+"ฬ":["M27.5 41.0 L28.6 42.1 L28.9 43.6 L27.9 46.2 L25.5 47.6 L20.1 48.7 L18.7 48.3 L16.3 46.7 L14.6 44.3 L14.1 41.4 L14.6 38.6 L16.2 36.4 L18.3 34.9 L20.8 34.2 L23.3 34.3 L25.6 35.2 L27.5 36.8 L28.8 39.0 L29.3 42.3 L28.4 46.3 L28.3 76.3 L29.3 81.3 L29.6 85.8 L31.9 82.5 L35.8 79.1 L49.2 54.4 L49.7 54.5 L50.7 56.2 L53.3 62.8 L61.8 78.8 L65.6 82.2 L68.5 85.8 L69.4 75.8 L69.3 49.5 L68.4 46.0 L70.0 42.7 L70.1 36.3 L69.8 34.7 L67.5 32.3 L65.9 31.9 L59.7 32.5 L58.4 33.0 L56.4 34.9 L55.0 38.6 L55.6 42.4 L56.9 44.4 L58.9 45.8 L62.4 46.5 L66.4 46.1 L67.7 45.5 L68.9 44.7 L70.0 42.5 L69.7 35.7 L70.0 33.7 L72.0 30.2 L76.0 26.0"],
+"อ":["M30.0 60.0 L29.1 61.1 L28.8 62.5 L29.8 65.0 L32.1 66.4 L37.4 67.4 L40.1 66.6 L42.2 64.6 L43.4 61.9 L43.5 59.0 L41.5 55.2 L39.3 53.7 L36.7 53.1 L33.0 53.7 L30.9 55.0 L29.5 56.9 L28.5 60.3 L29.6 66.4 L29.6 77.4 L30.8 81.2 L32.7 83.5 L35.1 85.2 L37.9 86.3 L44.8 87.4 L51.8 86.9 L57.3 85.0 L59.5 83.3 L61.3 81.0 L62.6 76.3 L62.6 48.3 L62.2 45.3 L60.6 41.8 L57.4 38.6 L52.4 35.9 L47.6 34.9 L40.6 34.9 L35.8 35.8 L32.1 37.2 L28.1 39.9 L24.5 43.9 L21.8 45.3 L21.0 45.0"],
+"ฮ":["M28.5 62.0 L27.3 64.7 L27.3 67.9 L28.1 69.4 L31.2 70.9 L36.1 70.3 L38.9 69.0 L40.8 66.7 L41.5 62.4 L40.0 58.8 L38.2 57.2 L36.1 56.4 L32.8 56.3 L30.7 56.9 L28.8 58.2 L27.4 60.0 L26.5 63.0 L26.7 71.1 L27.8 78.8 L30.0 82.8 L33.9 85.5 L39.6 87.1 L47.7 87.2 L53.5 86.0 L58.2 83.1 L60.1 80.5 L60.9 78.3 L61.1 54.1 L63.6 49.1 L64.0 47.2 L63.8 45.2 L62.1 41.1 L62.9 39.0 L64.2 37.2 L66.4 30.7 L64.9 31.2 L63.2 36.4 L62.1 38.0 L60.5 38.8 L58.7 38.8 L48.2 34.8 L40.2 34.3 L35.3 34.7 L31.5 35.7 L28.2 37.5 L26.2 40.1 L26.2 42.8 L27.8 45.1 L30.5 46.6 L34.5 47.6 L44.5 47.8 L53.5 46.1 L58.5 46.7 L66.5 46.5"],
+"๐":["M45.0 49.5 L35.2 51.3 L31.5 52.8 L28.1 55.0 L25.2 57.8 L23.0 61.2 L21.8 64.0 L21.3 68.0 L21.6 72.1 L22.8 76.0 L24.4 78.6 L27.1 81.7 L30.5 84.0 L35.1 86.1 L44.0 87.5 L53.0 86.5 L57.7 84.9 L61.2 82.8 L64.2 80.0 L66.5 76.7 L67.9 72.9 L68.4 68.9 L68.2 64.9 L66.8 61.2 L64.6 57.8 L61.7 55.0 L59.3 53.3 L55.6 51.6 L45.0 49.5"],
+"๑":["M51.0 69.0 L51.6 70.1 L51.7 72.8 L51.1 75.9 L50.2 77.0 L47.2 78.0 L41.5 76.5 L39.2 75.1 L37.3 71.5 L37.6 67.6 L38.8 65.5 L40.6 64.0 L44.7 62.9 L46.7 63.2 L49.4 64.6 L50.9 66.2 L51.8 68.2 L52.2 72.5 L50.3 77.3 L49.4 81.2 L47.6 83.6 L43.4 86.5 L38.3 87.7 L32.2 87.1 L27.5 85.0 L23.6 81.0 L21.1 75.5 L20.5 68.5 L21.9 62.5 L25.4 57.0 L30.5 53.2 L36.8 50.7 L43.7 49.9 L51.6 50.6 L57.1 52.6 L61.7 55.5 L65.7 59.8 L67.8 63.9 L69.2 69.9 L69.2 74.9 L67.7 81.8 L64.5 89.5 L65.0 90.0"],
+"๒":["M36.1 64.6 L34.8 64.8 L34.1 65.8 L33.3 68.1 L33.4 69.3 L34.6 71.2 L37.2 73.1 L40.0 73.6 L42.9 73.1 L45.3 71.2 L46.4 69.1 L46.5 65.4 L45.3 63.0 L44.2 62.2 L41.5 61.9 L36.0 64.2 L34.0 59.5 L33.9 57.5 L35.6 53.9 L37.9 51.5 L40.4 50.2 L44.1 49.6 L47.4 50.6 L51.3 53.5 L53.0 57.0 L53.5 55.0 L55.1 52.5 L57.2 50.8 L59.3 49.9 L62.0 49.8 L64.1 50.4 L67.3 53.2 L68.6 56.0 L69.6 60.1 L69.9 70.1 L69.2 74.1 L67.8 78.0 L64.4 82.3 L62.3 84.0 L58.9 85.7 L50.2 87.4 L38.3 87.0 L30.8 84.9 L27.6 83.2 L25.0 81.0 L23.2 78.6 L21.8 75.2 L21.0 70.3 L20.8 38.3 L19.8 35.0 L15.0 31.0"],
+"๓":["M26.5 76.5 L26.9 75.3 L27.9 74.7 L31.2 74.2 L34.1 76.1 L35.7 79.1 L35.9 81.5 L35.3 84.0 L33.6 86.3 L32.4 87.2 L31.0 87.8 L27.6 88.1 L24.3 87.0 L23.3 85.6 L22.8 83.8 L23.1 82.1 L26.1 76.8 L26.0 76.2 L20.7 73.9 L20.0 72.9 L19.5 70.6 L20.3 63.1 L22.2 57.3 L25.4 53.0 L29.5 50.7 L35.6 50.0 L40.0 51.2 L42.0 52.5 L47.0 57.9 L47.2 79.7 L48.0 87.7 L47.2 80.3 L47.2 58.3 L52.3 52.4 L54.2 51.1 L57.4 50.0 L62.5 50.4 L64.8 51.3 L66.7 52.9 L68.1 55.1 L68.9 57.7 L69.2 83.6 L70.0 88.0"],
+"๔":["M51.5 68.0 L52.3 69.1 L51.8 71.5 L50.6 74.0 L48.3 75.9 L45.4 76.5 L44.0 76.1 L41.5 74.5 L39.8 72.3 L38.9 69.7 L38.9 67.1 L39.7 64.6 L41.4 62.7 L43.6 61.6 L46.1 61.3 L48.5 61.6 L51.6 63.7 L53.2 67.1 L52.8 70.4 L49.8 74.9 L49.3 76.5 L49.9 80.2 L51.0 81.5 L54.3 83.4 L62.5 84.5 L76.0 88.5 L64.4 84.9 L55.2 83.5 L53.3 83.9 L50.5 85.8 L48.4 86.6 L37.2 87.6 L30.9 86.5 L26.2 83.9 L22.6 79.7 L21.0 75.5 L20.4 69.3 L20.9 64.3 L22.3 60.2 L24.7 56.8 L27.5 54.2 L31.7 52.0 L37.3 50.4 L42.3 49.7 L56.3 49.2 L64.2 47.3 L67.8 45.3 L71.2 41.9 L73.2 38.7 L77.0 31.0"],
+"๕":["M51.5 68.0 L52.3 69.1 L51.8 71.5 L50.6 74.0 L48.3 75.9 L45.4 76.5 L44.0 76.1 L41.5 74.5 L39.8 72.3 L38.9 69.7 L38.9 67.1 L39.7 64.6 L41.4 62.7 L43.6 61.6 L46.1 61.3 L48.5 61.6 L51.6 63.7 L53.2 67.1 L52.8 70.4 L49.8 74.9 L49.3 76.5 L49.9 80.2 L51.0 81.5 L54.3 83.4 L62.5 84.5 L76.0 88.5 L64.4 84.9 L55.2 83.5 L53.3 83.9 L50.5 85.8 L48.4 86.6 L37.2 87.6 L30.9 86.5 L26.2 83.9 L22.6 79.7 L21.0 75.5 L20.4 69.3 L20.9 64.3 L22.3 60.2 L24.6 56.7 L28.3 53.7 L32.6 51.6 L38.3 50.1 L42.1 48.6 L50.8 49.3 L53.4 48.7 L54.5 47.6 L55.8 44.7 L55.9 40.5 L55.3 38.2 L54.0 36.2 L52.0 34.8 L48.6 34.0 L46.2 34.3 L43.9 35.5 L42.2 37.5 L41.2 41.6 L42.1 46.1 L44.3 48.5 L45.7 49.1 L48.7 49.3 L51.3 49.2 L55.1 48.0 L60.0 48.7 L65.5 46.6 L70.5 42.7 L72.9 39.3 L76.5 31.2 L77.0 31.0"],
+"๖":["M32.0 80.5 L32.8 83.3 L34.5 83.0 L37.8 81.7 L38.8 80.5 L39.1 79.0 L39.0 74.6 L38.0 72.4 L36.3 70.8 L33.3 69.6 L30.2 69.5 L28.1 70.3 L25.6 72.7 L24.6 75.2 L24.5 78.0 L25.7 80.9 L27.6 83.3 L29.4 84.5 L31.0 85.1 L35.4 85.4 L39.1 87.4 L41.4 87.7 L51.8 86.9 L58.6 84.7 L62.0 82.7 L64.9 80.3 L68.0 75.2 L69.2 69.1 L68.4 63.0 L66.3 58.3 L61.7 54.0 L55.9 51.3 L49.1 49.9 L41.2 50.3 L34.5 52.2 L28.4 55.3 L25.0 59.9 L23.4 47.0 L22.1 40.2 L20.2 34.5 L17.8 31.2 L17.0 31.0"],
+"๗":["M24.1 76.1 L24.6 75.1 L26.6 74.2 L29.7 74.5 L32.7 77.2 L33.7 80.1 L33.7 82.2 L32.9 84.5 L31.3 86.6 L28.8 87.9 L25.8 88.3 L22.5 87.5 L21.1 86.6 L20.2 85.1 L20.0 83.3 L20.4 81.6 L23.8 75.9 L19.5 74.5 L17.6 72.9 L17.1 70.5 L17.3 66.1 L18.7 59.0 L20.3 55.5 L22.3 52.9 L25.0 51.0 L28.6 50.1 L32.0 50.4 L34.8 51.9 L38.9 56.3 L39.8 57.9 L40.0 69.8 L39.6 59.2 L39.9 57.3 L45.9 51.1 L48.1 50.2 L51.5 50.2 L54.5 51.2 L56.5 53.0 L58.4 56.4 L59.4 60.3 L59.4 69.3 L58.2 76.3 L56.9 79.7 L56.9 82.8 L57.8 84.1 L59.1 85.0 L60.5 85.2 L63.0 84.4 L66.3 81.9 L68.8 79.0 L70.8 75.4 L72.1 72.1 L73.0 67.2 L73.6 61.2 L73.9 43.2 L74.7 34.2 L74.5 31.2 L74.0 31.0"],
+"๘":["M63.0 77.5 L61.9 78.5 L58.0 77.6 L57.0 76.7 L56.0 74.2 L56.0 71.6 L56.8 69.2 L58.4 67.3 L61.5 65.8 L65.0 65.9 L68.2 67.6 L70.3 70.8 L70.7 73.6 L70.2 76.7 L68.8 79.8 L66.4 81.4 L63.6 81.0 L64.7 82.7 L64.3 84.5 L63.2 86.2 L61.4 87.4 L59.4 87.7 L53.7 87.0 L50.5 85.8 L46.9 83.6 L43.3 79.7 L42.5 74.5 L40.9 71.2 L38.1 75.3 L33.6 79.4 L30.1 83.7 L28.5 84.8 L26.6 85.1 L24.3 83.4 L21.8 78.3 L20.7 72.4 L20.8 65.4 L22.1 60.7 L24.5 56.8 L27.7 53.8 L31.6 51.7 L36.3 50.5 L40.2 50.1 L57.4 50.7 L60.4 49.9 L63.4 48.3 L65.9 45.8 L67.8 42.2 L68.9 38.6 L70.0 31.0"],
+"๙":["M34.0 79.0 L33.1 77.9 L33.4 76.6 L34.5 74.4 L35.5 73.6 L39.1 73.3 L41.3 74.0 L43.1 75.3 L44.9 78.2 L45.1 82.1 L42.8 86.0 L39.8 87.7 L38.1 87.5 L36.5 86.7 L35.4 85.4 L34.0 79.4 L33.5 79.2 L24.9 81.9 L21.6 78.0 L20.4 75.1 L19.6 68.9 L20.2 63.9 L21.4 59.9 L22.8 57.3 L27.3 52.6 L30.6 51.0 L33.9 50.2 L37.7 50.0 L40.5 50.5 L43.9 51.8 L49.2 55.5 L54.6 67.1 L57.3 71.7 L61.6 77.9 L70.0 88.0","M51.0 56.0 L54.2 51.3 L56.4 49.9 L59.6 50.6 L63.0 52.8 L65.9 54.0 L68.9 53.7 L70.5 52.7 L72.4 49.5 L73.1 45.7 L73.0 31.0"]};
+
+
+Object.assign(STROKES, STROKES_CENTRED);
+
+</script>
+<script>
+const DATA=[
+// char, romanised name, Thai word, meaning, class, starts as, ends as, obsolete
+["ก","gor gài","ไก่","chicken","mid","g","k"],
+["ข","kŏr kài","ไข่","egg","high","k","k"],
+["ฃ","kŏr kùat","ขวด","bottle","high","k","k",1],
+["ค","kor kwaai","ควาย","buffalo","low","k","k"],
+["ฅ","kor kon","คน","person","low","k","k",1],
+["ฆ","kor rá-kang","ระฆัง","bell","low","k","k"],
+["ง","ngor nguu","งู","snake","low","ng","ng"],
+["จ","jor jaan","จาน","plate","mid","j","t"],
+["ฉ","chŏr chìng","ฉิ่ง","small cymbals","high","ch","–"],
+["ช","chor cháang","ช้าง","elephant","low","ch","t"],
+["ซ","sor sôh","โซ่","chain","low","s","t"],
+["ฌ","chor cher","เฌอ","tree","low","ch","t"],
+["ญ","yor yǐng","หญิง","woman","low","y","n"],
+["ฎ","dor chá-daa","ชฎา","dancer's headdress","mid","d","t"],
+["ฏ","dtor bpà-dtàk","ปฏัก","goad","mid","dt","t"],
+["ฐ","tŏr tǎan","ฐาน","pedestal","high","t","t"],
+["ฑ","tor mon-toh","มณโฑ","Montho, a queen in the Ramakien","low","t","t"],
+["ฒ","tor pûu-tâo","ผู้เฒ่า","elder","low","t","t"],
+["ณ","nor neen","เณร","novice monk","low","n","n"],
+["ด","dor dèk","เด็ก","child","mid","d","t"],
+["ต","dtor dtào","เต่า","turtle","mid","dt","t"],
+["ถ","tŏr tǔng","ถุง","sack","high","t","t"],
+["ท","tor tá-hǎan","ทหาร","soldier","low","t","t"],
+["ธ","tor tong","ธง","flag","low","t","t"],
+["น","nor nǔu","หนู","mouse","low","n","n"],
+["บ","bor bai-máai","ใบไม้","leaf","mid","b","p"],
+["ป","bpor bplaa","ปลา","fish","mid","bp","p"],
+["ผ","pŏr pûeng","ผึ้ง","bee","high","p","–"],
+["ฝ","fŏr fǎa","ฝา","lid","high","f","–"],
+["พ","por paan","พาน","offering tray","low","p","p"],
+["ฟ","for fan","ฟัน","teeth","low","f","p"],
+["ภ","por sǎm-pao","สำเภา","junk ship","low","p","p"],
+["ม","mor máa","ม้า","horse","low","m","m"],
+["ย","yor yák","ยักษ์","giant","low","y","i (as in ไทย)"],
+["ร","ror ruea","เรือ","boat","low","r","n"],
+["ล","lor ling","ลิง","monkey","low","l","n"],
+["ว","wor wǎen","แหวน","ring","low","w","o (as in ข้าว)"],
+["ศ","sŏr sǎa-laa","ศาลา","pavilion","high","s","t"],
+["ษ","sŏr rue-sǐi","ฤๅษี","hermit","high","s","t"],
+["ส","sŏr sǔea","เสือ","tiger","high","s","t"],
+["ห","hŏr hìip","หีบ","chest","high","h","–"],
+["ฬ","lor jù-laa","จุฬา","star-shaped kite","low","l","n"],
+["อ","or àang","อ่าง","basin","mid","silent / vowel carrier","–"],
+["ฮ","hor nók-hûuk","นกฮูก","owl","low","h","–"],
+// numerals: char, romanised, Thai word, English, "num", value
+["๐","sǔun","ศูนย์","zero","num","0"],
+["๑","nùeng","หนึ่ง","one","num","1"],
+["๒","sǎawng","สอง","two","num","2"],
+["๓","sǎam","สาม","three","num","3"],
+["๔","sìi","สี่","four","num","4"],
+["๕","hâa","ห้า","five","num","5"],
+["๖","hòk","หก","six","num","6"],
+["๗","jèt","เจ็ด","seven","num","7"],
+["๘","bpàet","แปด","eight","num","8"],
+["๙","gâo","เก้า","nine","num","9"],
+];
+const CLS={
+  mid:{name:"Mid class",color:"var(--mid)",note:"9 letters. The simplest tone rules, so learn these first."},
+  high:{name:"High class",color:"var(--high)",note:"11 letters. Most are breathy (aspirated) sounds."},
+  low:{name:"Low class",color:"var(--low)",note:"24 letters. Many pair with a high-class twin of the same sound."},
+  num:{name:"Numbers",color:"var(--num)",note:"๐–๙. You'll see them on prices, dates, signs and banknotes."},
+};
+
+/* ---------- storage (optional, per device) ---------- */
+const store={get(k,d){try{const v=localStorage.getItem('ggp.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('ggp.'+k,JSON.stringify(v))}catch(e){}}};
+let done=store.get('done',{}), flags=store.get('flags',{}), pen=store.get('pen','brush');
+
+/* ---------- points: a daily score (resets each local day) plus an all-time total ---------- */
+const dayKey=()=>new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in the phone's own time zone
+let pts=store.get('pts',{day:dayKey(),today:0,total:0,best:0});
+function rollDay(){if(pts.day!==dayKey()){pts.day=dayKey();pts.today=0;store.set('pts',pts)}}
+function renderScore(bump){rollDay();$('#scoreToday').textContent=pts.today;$('#scoreTotal').textContent=pts.total?'· '+pts.total+' total':'';
+  if(bump){const s=$('#score');s.classList.remove('bump');void s.offsetWidth;s.classList.add('bump')}}
+function addPoints(n){rollDay();pts.today+=n;pts.total+=n;pts.best=Math.max(pts.best,pts.today);store.set('pts',pts);renderScore(true)}
+
+/* ---------- geometry ---------- */
+const NS='http://www.w3.org/2000/svg';
+const geo={};
+function geom(ch){
+  if(geo[ch])return geo[ch];
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('width',0);svg.setAttribute('height',0);svg.style.position='absolute';document.body.appendChild(svg);
+  const strokes=STROKES[ch].map(s=>{const p=document.createElementNS(NS,'path');p.setAttribute('d',expandStroke(s));svg.appendChild(p);
+    const len=p.getTotalLength(),pts=[];for(let l=0;l<=len;l+=1.5){const q=p.getPointAtLength(l);pts.push([q.x,q.y])}
+    return{d:expandStroke(s),len,pts}});
+  svg.remove();
+  return geo[ch]=strokes;
+}
+
+/* ---------- speech ---------- */
+let thVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();thVoice=vs.find(v=>/^th(-|_|$)/i.test(v.lang))||null;return thVoice}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(text,rate){
+  const msg=$('#voiceMsg');
+  if(!('speechSynthesis' in window)){msg.hidden=false;msg.textContent="This browser can't speak. Try Chrome on your phone.";return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='th-TH';u.rate=rate;if(pickVoice())u.voice=thVoice;
+  speechSynthesis.speak(u);
+  if(!thVoice){msg.hidden=false;msg.textContent="No Thai voice found on this device. On Android: Settings › Text-to-speech output › Google › install Thai, then reload."}
+  else msg.hidden=true;
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const el=(tag,attrs={},html)=>{const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e};
+const sname=r=>r[4]==='num'?r[2]:r[0]+'อ '+r[2];
+
+/* ---------- index ---------- */
+function renderIndex(){
+  const box=$('#classes');box.innerHTML='';
+  for(const c of ['mid','high','low','num']){
+    const h=el('div',{class:'cls'},`<i class="dot" style="background:${CLS[c].color}"></i><h2>${CLS[c].name}</h2><p>${CLS[c].note}</p>`);
+    const t=el('div',{class:'tiles'});
+    DATA.forEach((r,i)=>{if(r[4]!==c)return;
+      const b=el('button',{class:'tile'+(done[r[0]]?' done':'')+(flags[r[0]]?' flag':'')+(r[7]?' obs':''),'aria-label':r[1]+', '+r[3]},
+        `<span class="g" style="color:${CLS[c].color}">${r[0]}</span><span class="n">${r[1]}</span>`);
+      b.onclick=()=>openLetter(i);t.appendChild(b)});
+    box.append(h,t);
+  }
+  renderNotes();
+}
+function renderNotes(){
+  const ks=Object.keys(flags);
+  $('#notesText').textContent=ks.length?ks.map(k=>{const r=DATA.find(d=>d[0]===k);return `${k} (${r[1]}): ${flags[k]||'flagged, no note'}`}).join('\n'):'Nothing flagged yet.';
+  $('#copyNotes').hidden=!ks.length;
+}
+$('#copyNotes').onclick=e=>{const t=$('#notesText').textContent;
+  navigator.clipboard?.writeText(t).then(()=>e.target.textContent='Copied',()=>selectNotes()).catch(selectNotes)||selectNotes();
+  function selectNotes(){const r=document.createRange();r.selectNodeContents($('#notesText'));const s=getSelection();s.removeAllRanges();s.addRange(r);e.target.textContent='Selected, copy it'}};
+
+/* ---------- letter view ---------- */
+let cur=0, mode='watch';
+function openLetter(i){
+  cur=(i+DATA.length)%DATA.length;
+  $('#vIndex').hidden=true;$('#vLetter').hidden=false;$('#lnav').hidden=false;
+  try{history.replaceState(null,'','#l'+cur)}catch(e){}
+  const r=DATA[cur],c=CLS[r[4]];
+  $('#lBig').textContent=r[0];$('#lBig').style.color=c.color;
+  $('#lThai').textContent=sname(r);
+  $('#lRom').textContent=`${r[1]} · ${r[3]}`;
+  $('#lChips').innerHTML=r[4]==='num'
+    ?`<span class="chip c" style="background:${c.color}">Number</span><span class="chip">value <b>${r[5]}</b></span>`
+    :`<span class="chip c" style="background:${c.color}">${c.name}</span><span class="chip">starts a word as <b>${r[5]}</b></span><span class="chip">ends a word as <b>${r[6]}</b></span>`+(r[7]?'<span class="chip">no longer used</span>':'');
+  $('#flagChk').checked=r[0] in flags;$('#flagNote').hidden=!(r[0] in flags);$('#flagNote').value=flags[r[0]]||'';
+  setMode(mode);
+  window.scrollTo({top:0});
+}
+$('#prev').onclick=()=>openLetter(cur-1);
+$('#next').onclick=()=>openLetter(cur+1);
+const goHome=()=>{stopWatch();$('#vLetter').hidden=true;$('#vIndex').hidden=false;$('#lnav').hidden=true;try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
+$('#home').onclick=goHome;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderScore()});$('#grid').onclick=goHome;
+$('#sayName').onclick=()=>speak(sname(DATA[cur]),0.85);
+$('#saySlow').onclick=()=>speak(sname(DATA[cur]),0.5);
+$('#flagChk').onchange=e=>{const k=DATA[cur][0];if(e.target.checked){flags[k]=flags[k]||'';$('#flagNote').hidden=false;$('#flagNote').focus()}else{delete flags[k];$('#flagNote').hidden=true}store.set('flags',flags)};
+$('#flagNote').oninput=e=>{flags[DATA[cur][0]]=e.target.value;store.set('flags',flags)};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+document.addEventListener('keydown',e=>{if($('#vLetter').hidden||e.target.tagName==='TEXTAREA')return;if(e.key==='ArrowLeft')openLetter(cur-1);if(e.key==='ArrowRight')openLetter(cur+1)});
+
+const HINTS={
+  watch:"Watch the pen. Thai letters start at the little loop, the “head”, wherever it has one.",
+  trace:"Trace over the grey letter with your finger. Start at the gold dot.",
+  memory:"Write it from memory, then tap Check to see the letter on top.",
+  book:"Copy the letter along the rows. The guide fades as you go, so the last boxes are all you.",
+};
+function setMode(m){
+  mode=m;stopWatch();
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.mode===m));
+  $('#hint').textContent=HINTS[m];
+  $('#result').hidden=true;
+  const book=m==='book';$('#deskBook').hidden=!book;$('#deskSingle').hidden=book;
+  if(book){buildBook();return}
+  buildPad();
+  const tools=$('#tools');tools.innerHTML='';
+  if(m==='watch'){
+    tools.append(btn('▶ Play again',()=>playWatch(1)),btn('Slow',()=>playWatch(0.45)));
+    playWatch(1);
+  }else{
+    tools.append(btn('Undo',()=>{ink.undo();awarded=false;ink.strokes.length?check(false):showResult(null)}),btn('Clear',()=>{ink.clear();awarded=false;showResult(null)}),btn('Show me',demo),btn('Check',()=>check(true),'pri'),penBtn());
+    showResult(null);
+  }
+}
+function btn(t,f,cls){const b=el('button',{class:'btn'+(cls?' '+cls:'')},t);b.onclick=f;return b}
+function penBtn(){const b=btn('',()=>{pen=pen==='brush'?'mono':'brush';store.set('pen',pen);b.textContent=penLabel();});b.textContent=penLabel();return b}
+const penLabel=()=>pen==='brush'?'Pen: brush':'Pen: monoline';
+
+/* ---------- pad (svg + canvas) ---------- */
+function guidesSvg(){
+  return `<g stroke="var(--line)" stroke-width=".35">
+    <line x1="0" x2="90" y1="8" y2="8" stroke-dasharray="1.5 1.5"/>
+    <line x1="0" x2="90" y1="32" y2="32"/>
+    <line x1="0" x2="90" y1="61" y2="61" stroke-dasharray=".6 1.8"/>
+    <line x1="0" x2="90" y1="90" y2="90" stroke="var(--line-strong)" stroke-width=".5"/>
+    <line x1="0" x2="90" y1="118" y2="118" stroke-dasharray="1.5 1.5"/></g>`;
+}
+/* The letter is drawn with canvas (exactly how stroke paths were measured), then used as an SVG mask.
+   SVG <text> lands ~2 units off from canvas text, which made the strokes look misplaced. */
+const glyphCache={};
+function glyphURL(ch){
+  if(glyphCache[ch])return glyphCache[ch];
+  const K=4,c=document.createElement('canvas');c.width=100*K;c.height=130*K;
+  const a=c.getContext('2d');a.font=(100*K)+'px Sarabun';a.textAlign='center';a.fillStyle='#fff';a.fillText(ch,45*K,90*K);
+  return glyphCache[ch]=c.toDataURL();
+}
+const glyphMask=(id,ch)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="90" height="125"><image href="${glyphURL(ch)}" x="0" y="0" width="100" height="130"/></mask>`;
+let watchRaf=0;
+let awarded=false;
+function buildPad(){
+  awarded=false;
+  const ch=DATA[cur][0],g=geom(ch),showGhost=mode!=='memory';
+  const svg=$('#padSvg');
+  const starts=g.map((s,i)=>`<g class="start"><circle cx="${s.pts[0][0]}" cy="${s.pts[0][1]}" r="2.8" fill="var(--accent)"/>`+(g.length>1?`<text x="${s.pts[0][0]}" y="${s.pts[0][1]+1.3}" font-size="3.6" text-anchor="middle" fill="#1b1300" font-family="sans-serif" font-weight="700">${i+1}</text>`:'')+`</g>`).join('');
+  svg.innerHTML=guidesSvg()+
+    `<defs>${glyphMask('gl',ch)}</defs>
+     <g id="ghost" ${showGhost?'':'opacity="0"'}><rect width="90" height="125" fill="var(--ghost)" mask="url(#gl)"/></g>
+     <defs><mask id="reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="90" height="125">${g.map((s,i)=>`<path id="mp${i}" d="${s.d}" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${s.len} ${s.len}" stroke-dashoffset="${mode==='watch'?s.len:0}"/>`).join('')}</mask></defs>
+     <g mask="url(#reveal)" id="inked" ${mode==='watch'?'':'opacity="0"'}><rect width="90" height="125" fill="var(--ink)" mask="url(#gl)"/></g>
+     <g id="miss"></g>
+     ${mode==='memory'?'':starts}
+     <circle id="penDot" r="2.2" fill="var(--accent)" stroke="var(--paper)" stroke-width=".8" opacity="0"/>`;
+  ink.attach($('#padCanvas'),mode!=='watch');
+}
+function stopWatch(){cancelAnimationFrame(watchRaf)}
+function demo(){const k=$('#inked');k.setAttribute('opacity',.5);playWatch(1,()=>setTimeout(()=>k.setAttribute('opacity',0),500))}
+function playWatch(speed,onEnd){
+  stopWatch();
+  const g=geom(DATA[cur][0]);if(!$('#mp0'))buildPad();
+  const dot=$('#penDot');
+  g.forEach((s,i)=>$('#mp'+i).setAttribute('stroke-dashoffset',s.len));
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){g.forEach((s,i)=>$('#mp'+i).setAttribute('stroke-dashoffset',0));onEnd&&setTimeout(onEnd,1200);return}
+  const v=38*speed, pause=0.45; // units per second, seconds between strokes
+  const plan=[];let t=0.35;g.forEach((s,i)=>{plan.push({i,t0:t,t1:t+s.len/v});t+=s.len/v+pause});
+  let t0=null;
+  const step=ts=>{if(t0==null)t0=ts;const el2=(ts-t0)/1000;let active=null;
+    for(const p of plan){const s=g[p.i];const f=Math.max(0,Math.min(1,(el2-p.t0)/(p.t1-p.t0)));
+      $('#mp'+p.i).setAttribute('stroke-dashoffset',s.len*(1-f));
+      if(el2>=p.t0&&el2<=p.t1)active={s,f}}
+    if(active){const q=active.s.pts[Math.min(active.s.pts.length-1,Math.round(active.f*(active.s.pts.length-1)))];dot.setAttribute('cx',q[0]);dot.setAttribute('cy',q[1]);dot.setAttribute('opacity',1)}
+    else dot.setAttribute('opacity',0);
+    if(el2<t+0.2)watchRaf=requestAnimationFrame(step);else onEnd&&onEnd()};
+  watchRaf=requestAnimationFrame(step);
+}
+
+/* ---------- ink: finger drawing on a canvas ---------- */
+function makeInk(){
+  let cv,ctx,strokes=[],cur=null,pid=null,on=false,unitW=90,unitH=125,onChange=null,ro=null;
+  function size(){const r=cv.getBoundingClientRect();if(!r.width)return;const dpr=Math.min(3,devicePixelRatio||1);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(cv.width/unitW,0,0,cv.height/unitH,0,0);redraw()}
+  function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*unitW,(e.clientY-r.top)/r.height*unitH,e.timeStamp,e.pointerType==='pen'&&e.pressure>0?e.pressure:null]}
+  function width(a,b){if(pen==='mono')return 5.2;if(b[3]!=null)return 2.4+5.4*b[3];const d=Math.hypot(b[0]-a[0],b[1]-a[1]),dt=Math.max(1,b[2]-a[2]);const sp=d/dt*16;return Math.max(2.6,Math.min(7.2,7.4-sp*1.3))}
+  function seg(a,b,w){ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+  function redraw(){if(!ctx)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.restore();
+    ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');ctx.lineCap='round';ctx.lineJoin='round';
+    for(const s of strokes){let w=null;for(let i=1;i<s.length;i++){const nw=width(s[i-1],s[i]);w=w==null?nw:w*0.7+nw*0.3;seg(s[i-1],s[i],w)}if(s.length===1){ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(s[0][0],s[0][1],2.4,0,7);ctx.fill()}}}
+  const down=e=>{if(!on||cur)return;e.preventDefault();pid=e.pointerId;try{cv.setPointerCapture(e.pointerId)}catch(_){}cur=[pos(e)];strokes.push(cur);redraw()};
+  const move=e=>{if(!on||!cur||e.pointerId!==pid)return;e.preventDefault();let evs=e.getCoalescedEvents?e.getCoalescedEvents():[];if(!evs.length)evs=[e];for(const ev of evs){const p=pos(ev);const l=cur[cur.length-1];if(Math.hypot(p[0]-l[0],p[1]-l[1])<0.4)continue;cur.push(p)}redraw()};
+  const up=e=>{if(cur&&e.pointerId===pid){cur=null;pid=null;onChange&&onChange()}};
+  return{
+    attach(canvas,enabled,opts={}){if(cv){cv.onpointerdown=cv.onpointermove=cv.onpointerup=cv.onpointercancel=null;ro&&ro.disconnect()}
+      cv=canvas;ctx=cv.getContext('2d');on=enabled;cur=null;pid=null;strokes=opts.keep?strokes:[];unitW=opts.w||90;unitH=opts.h||125;onChange=opts.onChange||(()=>check(false));
+      cv.onpointerdown=down;cv.onpointermove=move;cv.onpointerup=up;cv.onpointercancel=up;cv.style.pointerEvents=enabled?'auto':'none';
+      ro=new ResizeObserver(size);ro.observe(cv);size()},
+    clear(){strokes=[];redraw()},
+    undo(){strokes.pop();redraw()},
+    get strokes(){return strokes},redraw
+  };
+}
+const ink=makeInk();
+
+/* ---------- checking a trace ---------- */
+function check(final){
+  if(mode==='watch'||mode==='book')return;
+  const g=geom(DATA[cur][0]),user=ink.strokes.flat();
+  if(!user.length){showResult(null);return}
+  const near=(p,arr,r)=>arr.some(q=>(q[0]-p[0])**2+(q[1]-p[1])**2<r*r);
+  const all=g.flatMap(s=>s.pts);
+  const missed=[];let hit=0;
+  for(const p of all){if(near(p,user,6))hit++;else missed.push(p)}
+  const cover=hit/all.length;
+  const onLine=user.filter(p=>near(p,all,6.5)).length/user.length;
+  // match each finger stroke to the drafted stroke nearest to where it began
+  const nearIdx=(p,st,r2)=>{let b=-1,bd=r2;st.pts.forEach((q,i)=>{const d=(q[0]-p[0])**2+(q[1]-p[1])**2;if(d<bd){bd=d;b=i}});return b};
+  const assign=ink.strokes.map(us=>{let best=0,bd=1e9;g.forEach((st,k)=>{for(const q of st.pts){const d=(q[0]-us[0][0])**2+(q[1]-us[0][1])**2;if(d<bd){bd=d;best=k}}});return best});
+  const orderOk=assign.every((v,i)=>i===0||v>=assign[i-1]);
+  const startOk=g.every((st,k)=>{const i=assign.indexOf(k);if(i<0)return true;const p=ink.strokes[i][0];return Math.hypot(p[0]-st.pts[0][0],p[1]-st.pts[0][1])<8});
+  // direction: walk each finger stroke and count steps forward/backward along its matched path (small steps only, so loops don't confuse it)
+  let fwd=0,back=0;
+  ink.strokes.forEach((us,i)=>{const st=g[assign[i]];let prev=-1;for(const p of us){const k=nearIdx(p,st,64);if(k<0)continue;if(prev>=0){const d=k-prev;if(Math.abs(d)<=12){if(d>0)fwd++;else if(d<0)back++}}prev=k}});
+  const dirOk=fwd+back<8||fwd>=0.6*(fwd+back);
+  if(!final&&cover<0.9){showProgress(cover);return}
+  const good=cover>=0.85&&onLine>=0.75;
+  if(final&&mode==='memory')$('#ghost').setAttribute('opacity',1);
+  if(final){$('#miss').innerHTML=missed.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.1" fill="var(--warn)"/>`).join('')}
+  const allOk=good&&startOk&&dirOk&&orderOk;
+  if(allOk&&!awarded){
+    awarded=true;
+    const ch=DATA[cur][0],first=!done[ch];
+    let n=10+Math.round(Math.max(0,Math.min(1,(onLine-0.75)/0.25))*5); // 10, up to +5 for a clean line
+    if(mode==='memory')n*=2;                                           // from memory counts double
+    if(first)n+=10;                                                    // first time ever for this letter
+    done[ch]=1;store.set('done',done);
+    celebrate(n,first?'New letter!':mode==='memory'?'From memory ×2':'');
+  }
+  const r=$('#result');r.hidden=false;
+  r.innerHTML=`<b>${good?(allOk?'Nicely done.':'Good shape, check the notes below.'):'Keep going.'}</b> ${Math.round(cover*100)}% of the letter covered, ${Math.round(onLine*100)}% of your ink on the line.<br>`+
+    (startOk?'✓ Started at the right spot':(g.length>1?'✗ Start each stroke at its gold dot':'✗ Start at the gold dot (the head)'))+' · '+(dirOk?'✓ right direction':'✗ try the other direction')+(g.length>1?' · '+(orderOk?'✓ strokes in order':'✗ follow the numbers 1, 2'):'')+
+    (final&&missed.length?'<br><span class="small">Red dots mark parts you missed.</span>':'')+
+    `<div class="meter"><i style="width:${Math.round(cover*100)}%"></i></div>`;
+}
+/* the "dopamine" moment: everything turns green, points pop, a chime and a short buzz, then a fresh pad */
+let winTimer=0,audioCtx=null;
+function chime(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const t=audioCtx.currentTime;
+  [[784,0],[1047,.11],[1319,.22]].forEach(([f,d])=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t+d);g.gain.exponentialRampToValueAtTime(0.18,t+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.5);o.connect(g).connect(audioCtx.destination);o.start(t+d);o.stop(t+d+0.55)})}catch(e){}}
+function celebrate(n,note){
+  addPoints(n);chime();try{navigator.vibrate&&navigator.vibrate([30,40,60])}catch(e){}
+  const pad=$('#pad');pad.querySelectorAll('.pop').forEach(e=>e.remove());
+  pad.insertAdjacentHTML('beforeend',`<div class="pop">+${n}${note?`<small>${note}</small>`:''}</div>`);
+  document.body.classList.add('win');clearTimeout(winTimer);
+  const at=cur,inMode=mode;
+  winTimer=setTimeout(()=>{document.body.classList.remove('win');pad.querySelectorAll('.pop').forEach(e=>e.remove());
+    if(cur===at&&mode===inMode){ink.clear();awarded=false;showResult(null);$('#hint').textContent="Again! Every clean letter adds to today's score."}},1700);
+}
+function showProgress(c){const r=$('#result');r.hidden=false;r.innerHTML=`<span class="small">Covered so far</span><div class="meter"><i style="width:${Math.round(c*100)}%"></i></div>`}
+function showResult(x){if(!x){$('#result').hidden=true;const m=$('#miss');if(m)m.innerHTML='';if(mode==='memory'&&$('#ghost'))$('#ghost').setAttribute('opacity',0)}}
+
+/* ---------- copybook ---------- */
+const bookInk=makeInk();
+function buildBook(){
+  const ch=DATA[cur][0],book=$('#book');
+  const cols=book.parentElement.clientWidth<480?3:5,rows=cols===3?4:3;
+  const fade=[1,.5,.5,.3,.3,.18,.18,.1,0,0,0,0,0,0,0];
+  book.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  book.innerHTML='';
+  for(let i=0;i<cols*rows;i++){
+    const f=fade[i]??0;
+    book.insertAdjacentHTML('beforeend',`<svg viewBox="0 0 90 125" aria-hidden="true">${guidesSvg()}<defs>${glyphMask('bm'+i,ch)}</defs><rect width="90" height="125" fill="${i===0?'var(--ink)':'var(--line-strong)'}" opacity="${f}" mask="url(#bm${i})"/></svg>`);
+  }
+  const cv=el('canvas');book.appendChild(cv);
+  bookInk.attach(cv,true,{w:90*cols,h:125*rows,onChange:()=>{}});
+  $('#bookPen').textContent=penLabel();
+}
+$('#bookClear').onclick=()=>bookInk.clear();
+$('#bookPen').onclick=()=>{pen=pen==='brush'?'mono':'brush';store.set('pen',pen);$('#bookPen').textContent=penLabel();bookInk.redraw()};
+addEventListener('resize',()=>{if(mode==='book'&&!$('#deskBook').hidden){const c=$('#book').parentElement.clientWidth<480?3:5;if(c!==($('#book').style.gridTemplateColumns.match(/\d+/)||[])[0]*1)buildBook()}});
+
+/* ---------- boot ---------- */
+renderScore();renderIndex();
+const m=/^#l(\d+)$/.exec(location.hash);
+const boot=()=>{if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
+(document.fonts?document.fonts.load('100px Sarabun','กขค'):Promise.resolve()).then(boot,boot);
+</script>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'))</script></body></html>
