@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gor Gai Pad</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f1417"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gor Gai Pad</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0f1417"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Gor Gai"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&family=Bai+Jamjuree:wght@500;600&display=swap">
@@ -30,7 +30,7 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:760px;margin:0 auto;padding-block:12px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;padding-block:12px calc(96px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px;transition:background .5s}
 .score{display:flex;align-items:baseline;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 12px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background .5s,border-color .5s}
 .score b{font:600 20px/1 var(--f-display);color:var(--win-ink)}
@@ -83,6 +83,35 @@ body.win .score{border-color:var(--win-ink)}
 .join h3{font:600 16px/1.2 var(--f-display);margin:0}
 .join .row{display:flex;gap:8px;flex-wrap:wrap}
 .join input{flex:1 1 160px;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:0 12px;font:inherit}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper);border-top:1px solid var(--line);padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));box-shadow:0 -4px 18px rgba(0,0,0,.08)}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:6px 0;border-radius:10px;color:var(--muted);font-size:12px;font-weight:500;min-height:48px}
+.tabbar svg{width:24px;height:24px}
+.tabbar .tg{font:400 24px/24px var(--f-letter)}
+.tabbar button[aria-current="page"]{color:var(--accent-ink);background:var(--accent-soft)}
+.spk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.chiprow{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chiprow button{flex:0 0 auto;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-weight:500;color:var(--muted);white-space:nowrap}
+.chiprow button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.plist{display:grid;gap:10px}
+.pcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:6px;min-width:0}
+.pth{font:400 30px/1.35 var(--f-letter);display:flex;flex-wrap:wrap;column-gap:0}
+.pth .w{border-radius:6px;padding:0 1px;cursor:pointer}
+.pth .w:hover,.pth .w:focus-visible{background:var(--accent-soft)}
+.pth .w.auto{color:var(--accent-ink)}
+.pth .w.blank{color:var(--muted);cursor:default}
+.prom{color:var(--ink);font-size:15px}
+.pen{color:var(--muted);font-size:14px}
+.pact{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.pact .btn{min-height:40px;padding:0 12px}
+.pact .fav[aria-pressed="true"]{color:var(--accent-ink);background:var(--accent-soft);border-color:var(--accent)}
+.plet{display:flex;gap:4px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
+.plet button{border:1px solid var(--line);background:var(--bg);border-radius:8px;min-width:34px;height:34px;font:400 20px/1 var(--f-letter);color:var(--ink)}
+.pflag{font-size:12px;color:var(--muted)}
+.pflag button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:4px 0;font-size:12px}
+.pflag textarea{width:100%;min-height:54px;margin-top:4px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px;font:inherit}
+.ppad{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden;touch-action:none;margin-top:6px}
+.ppad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.ppadtools{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
 .notes{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
 .notes h2{font:600 15px/1.2 var(--f-display);margin:0 0 6px}
 .notes pre{white-space:pre-wrap;font:13px/1.5 var(--f-body);margin:8px 0;color:var(--muted);max-height:220px;overflow:auto}
@@ -104,7 +133,7 @@ body.win .score{border-color:var(--win-ink)}
 .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
 .hint{font-size:13px;color:var(--muted);margin:0 0 8px;min-height:1.5em}
 .deskrow{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
-.pad{position:relative;width:min(100%,400px,calc(50vh * 90 / 125));margin-inline:auto;aspect-ratio:90/125;max-width:100%;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;touch-action:none;flex:0 0 auto}
+.pad{position:relative;width:min(100%,400px,calc(40vh * 90 / 125));margin-inline:auto;aspect-ratio:90/125;max-width:100%;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;touch-action:none;flex:0 0 auto}
 .pad svg,.pad canvas,.book canvas{position:absolute;inset:0;width:100%;height:100%}
 .pad canvas,.book canvas{touch-action:none}
 .side{flex:1 1 220px;min-width:0;display:grid;gap:10px}
@@ -145,6 +174,16 @@ body.win .score{border-color:var(--win-ink)}
     </div>
   </section>
 
+  <section id="vPhrases" hidden>
+    <div class="boardhead"><h2>Daily phrases</h2></div>
+    <div class="spk"><span class="small">I speak as</span>
+      <div class="seg" role="group" aria-label="Polite ending"><button data-s="m" aria-pressed="true">ครับ · man</button><button data-s="f" aria-pressed="false">ค่ะ · woman</button></div></div>
+    <div class="chiprow" id="pgChips" role="group" aria-label="Phrase groups"></div>
+    <div class="small voicemsg" hidden></div>
+    <div class="plist" id="pList"></div>
+    <p class="small">Tap a single word to hear it. The gold words change with your choice above: Thai adds a polite ending, ครับ for men and ค่ะ (คะ in questions) for women. Audio uses your phone's Thai voice. Wording and tones are worth a check with a Thai friend; use “Sounds wrong?” to note anything.</p>
+  </section>
+
   <section id="vBoard" hidden>
     <div class="boardhead">
       <h2>Leaderboard</h2>
@@ -171,7 +210,7 @@ body.win .score{border-color:var(--win-ink)}
         <button class="btn pri" id="sayName">▶ Hear the name</button>
         <button class="btn" id="saySlow">Slowly</button>
       </div>
-      <div class="small" id="voiceMsg" style="grid-column:1/-1" hidden></div>
+      <div class="small voicemsg" id="voiceMsg" style="grid-column:1/-1" hidden></div>
     </div>
 
     <div class="tabs" role="tablist">
@@ -203,6 +242,11 @@ body.win .score{border-color:var(--win-ink)}
     </div>
   </section>
 </div>
+<nav class="tabbar" aria-label="Sections">
+  <button data-v="letters"><span class="tg" aria-hidden="true">ก</span>Letters</button>
+  <button data-v="phrases"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/></svg>Phrases</button>
+  <button data-v="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v3M8 20h8M9 17h6v3H9z"/></svg>Board</button>
+</nav>
 
 <script>
 // Draft stroke paths in a 90x125 box: baseline y=90, glyph = Sarabun at 100 units centred on x=45.
@@ -333,6 +377,94 @@ const STROKES_CENTRED = {"ก":["M30.0 87.0 L29.2 86.1 L28.1 82.1 L28.3 63.0 L29
 
 Object.assign(STROKES, STROKES_CENTRED);
 
+// Daily phrases. Each phrase is a list of words [thai, romanisation] so a single word can be played.
+// pol: add the polite ending (men ครับ khráp; women ค่ะ khâ, or คะ khá in questions)
+// q:   it's a question (changes the women's ending to คะ)
+// "{I}" as a word = "I": men ผม phǒm, women ฉัน chǎn
+// ["…","…"] = a blank you fill in yourself (shown, not spoken)
+// Romanisation: Paiboon-style with tone marks. Worth a check by a native speaker.
+const PHRASE_GROUPS = [
+  ['basics', 'Basics'],
+  ['eat', 'Eating out'],
+  ['shop', 'Shopping'],
+  ['go', 'Getting around'],
+  ['money', 'Numbers & money'],
+  ['talk', 'Small talk'],
+  ['help', 'Help'],
+];
+const PHRASES = [
+  // basics
+  {id:'hello',     g:'basics', en:'Hello / goodbye',            w:[['สวัสดี','sà-wàt-dii']], pol:1},
+  {id:'thanks',    g:'basics', en:'Thank you',                  w:[['ขอบคุณ','khàawp-khun']], pol:1},
+  {id:'thanks2',   g:'basics', en:'Thank you very much',        w:[['ขอบคุณ','khàawp-khun'],['มาก','mâak']], pol:1},
+  {id:'sorry',     g:'basics', en:'Sorry / excuse me',          w:[['ขอโทษ','khǎaw-thôot']], pol:1},
+  {id:'nevermind', g:'basics', en:'No problem / never mind',    w:[['ไม่','mâi'],['เป็นไร','bpen rai']], pol:1},
+  {id:'yes',       g:'basics', en:'Yes, that\'s right',          w:[['ใช่','châi']], pol:1},
+  {id:'no',        g:'basics', en:'No, that\'s not right',       w:[['ไม่','mâi'],['ใช่','châi']], pol:1},
+  {id:'dontget',   g:'basics', en:'I don\'t understand',         w:[['ไม่','mâi'],['เข้าใจ','khâo-jai']], pol:1},
+  {id:'slowly',    g:'basics', en:'Please speak slowly',        w:[['พูด','phûut'],['ช้าๆ','cháa-cháa'],['หน่อย','nòi']], pol:1},
+  {id:'english',   g:'basics', en:'Can you speak English?',     w:[['พูด','phûut'],['ภาษา','phaa-sǎa'],['อังกฤษ','ang-grìt'],['ได้','dâai'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'howareyou', g:'basics', en:'How are you?',               w:[['สบาย','sà-baai'],['ดี','dii'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'fine',      g:'basics', en:'I\'m fine',                   w:[['สบาย','sà-baai'],['ดี','dii']], pol:1},
+  // eating out
+  {id:'bill',      g:'eat', en:'The bill, please',              w:[['เช็ก','chék'],['บิล','bin']], pol:1},
+  {id:'notspicy',  g:'eat', en:'Not spicy',                     w:[['ไม่','mâi'],['เผ็ด','phèt']], pol:1},
+  {id:'littlespicy',g:'eat',en:'A little spicy',                w:[['เผ็ด','phèt'],['นิดหน่อย','nít-nòi']], pol:1},
+  {id:'delicious', g:'eat', en:'Very delicious!',               w:[['อร่อย','à-ròi'],['มาก','mâak']], pol:1},
+  {id:'water',     g:'eat', en:'Water, please',                 w:[['ขอ','khǎaw'],['น้ำเปล่า','nám-bplàao']], pol:1},
+  {id:'noice',     g:'eat', en:'No ice',                        w:[['ไม่','mâi'],['ใส่','sài'],['น้ำแข็ง','nám-khǎeng']], pol:1},
+  {id:'lesssweet', g:'eat', en:'Less sweet',                    w:[['หวาน','wǎan'],['น้อย','nóoi']], pol:1},
+  {id:'thisone',   g:'eat', en:'I\'d like this one',             w:[['เอา','ao'],['อัน','an'],['นี้','níi']], pol:1},
+  {id:'takeaway',  g:'eat', en:'To take away',                  w:[['ห่อ','hàaw'],['กลับ','glàp'],['บ้าน','bâan']], pol:1},
+  {id:'eathere',   g:'eat', en:'To eat here',                   w:[['ทาน','thaan'],['ที่นี่','thîi-nîi']], pol:1},
+  {id:'veg',       g:'eat', en:'I\'m vegetarian',                w:[['{I}',''],['กิน','gin'],['มังสวิรัติ','mang-sà-wí-rát']], pol:1},
+  {id:'onemore',   g:'eat', en:'One more, please',              w:[['ขอ','khǎaw'],['อีก','ìik'],['หนึ่ง','nùeng']], pol:1},
+  // shopping
+  {id:'howmuch',   g:'shop', en:'How much is it?',              w:[['เท่าไหร่','thâo-rài']], pol:1, q:1},
+  {id:'expensive', g:'shop', en:'Too expensive',                w:[['แพง','phaeng'],['ไป','bpai']], pol:1},
+  {id:'discount',  g:'shop', en:'Can you lower the price?',     w:[['ลด','lót'],['ได้','dâai'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'buythis',   g:'shop', en:'I\'ll buy this one',            w:[['ซื้อ','súue'],['อัน','an'],['นี้','níi']], pol:1},
+  {id:'looking',   g:'shop', en:'Just looking',                 w:[['ดู','duu'],['เฉยๆ','chǒei-chǒei']], pol:1},
+  {id:'bag',       g:'shop', en:'Do you have a bag?',           w:[['มี','mii'],['ถุง','thǔng'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'card',      g:'shop', en:'Can I pay by card?',           w:[['จ่าย','jàai'],['บัตร','bàt'],['ได้','dâai'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'qr',        g:'shop', en:'Can I pay by QR scan?',        w:[['สแกน','sà-gaen'],['จ่าย','jàai'],['ได้','dâai'],['ไหม','mǎi']], pol:1, q:1},
+  // getting around
+  {id:'goto',      g:'go', en:'Go to …, please',                w:[['ไป','bpai'],['…','…']], pol:1},
+  {id:'stop',      g:'go', en:'Stop here',                      w:[['จอด','jàawt'],['ตรงนี้','dtrong-níi']], pol:1},
+  {id:'left',      g:'go', en:'Turn left',                      w:[['เลี้ยว','líao'],['ซ้าย','sáai']], pol:1},
+  {id:'right',     g:'go', en:'Turn right',                     w:[['เลี้ยว','líao'],['ขวา','khwǎa']], pol:1},
+  {id:'straight',  g:'go', en:'Go straight',                    w:[['ตรง','dtrong'],['ไป','bpai']], pol:1},
+  {id:'toilet',    g:'go', en:'Where is the toilet?',           w:[['ห้องน้ำ','hâawng-náam'],['อยู่','yùu'],['ที่ไหน','thîi-nǎi']], pol:1, q:1},
+  {id:'meter',     g:'go', en:'Please use the meter',           w:[['เปิด','bpòoet'],['มิเตอร์','mí-dtôoe'],['ด้วย','dûai']], pol:1},
+  {id:'far',       g:'go', en:'Is it far?',                     w:[['ไกล','glai'],['ไหม','mǎi']], pol:1, q:1},
+  {id:'bts',       g:'go', en:'Where is the BTS station?',      w:[['สถานี','sà-thǎa-nii'],['รถไฟฟ้า','rót-fai-fáa'],['อยู่','yùu'],['ที่ไหน','thîi-nǎi']], pol:1, q:1},
+  // numbers & money
+  {id:'b20',       g:'money', en:'Twenty baht',                 w:[['ยี่สิบ','yîi-sìp'],['บาท','bàat']]},
+  {id:'b100',      g:'money', en:'One hundred baht',            w:[['หนึ่ง','nùeng'],['ร้อย','rói'],['บาท','bàat']]},
+  {id:'b500',      g:'money', en:'Five hundred baht',           w:[['ห้า','hâa'],['ร้อย','rói'],['บาท','bàat']]},
+  {id:'b1000',     g:'money', en:'One thousand baht',           w:[['หนึ่ง','nùeng'],['พัน','phan'],['บาท','bàat']]},
+  {id:'howmany',   g:'money', en:'How many?',                   w:[['กี่','gìi'],['อัน','an']], pol:1, q:1},
+  {id:'keepchange',g:'money', en:'Keep the change',             w:[['ไม่','mâi'],['ต้อง','dtâawng'],['ทอน','thaawn']], pol:1},
+  // small talk
+  {id:'name',      g:'talk', en:'What\'s your name?',            w:[['คุณ','khun'],['ชื่อ','chûue'],['อะไร','à-rai']], pol:1, q:1},
+  {id:'myname',    g:'talk', en:'My name is …',                 w:[['{I}',''],['ชื่อ','chûue'],['…','…']], pol:1},
+  {id:'meet',      g:'talk', en:'Nice to meet you',             w:[['ยินดี','yin-dii'],['ที่','thîi'],['ได้','dâai'],['รู้จัก','rúu-jàk']], pol:1},
+  {id:'from',      g:'talk', en:'Where are you from?',          w:[['คุณ','khun'],['มา','maa'],['จาก','jàak'],['ไหน','nǎi']], pol:1, q:1},
+  {id:'imfrom',    g:'talk', en:'I\'m from …',                   w:[['{I}',''],['มา','maa'],['จาก','jàak'],['…','…']], pol:1},
+  {id:'learning',  g:'talk', en:'I\'m learning Thai',            w:[['{I}',''],['กำลัง','gam-lang'],['เรียน','rian'],['ภาษา','phaa-sǎa'],['ไทย','thai']], pol:1},
+  {id:'livebkk',   g:'talk', en:'I live in Bangkok',            w:[['{I}',''],['อยู่','yùu'],['กรุงเทพฯ','grung-thêep']], pol:1},
+  {id:'great',     g:'talk', en:'Very good!',                   w:[['ดี','dii'],['มาก','mâak']], pol:1},
+  {id:'seeyou',    g:'talk', en:'See you again',                w:[['แล้ว','láew'],['เจอ','jooe'],['กัน','gan'],['ใหม่','mài']], pol:1},
+  // help
+  {id:'helpme',    g:'help', en:'Help!',                        w:[['ช่วย','chûai'],['ด้วย','dûai']]},
+  {id:'police',    g:'help', en:'Call the police',              w:[['เรียก','rîak'],['ตำรวจ','dtam-rùat']]},
+  {id:'hospital',  g:'help', en:'Go to the hospital',           w:[['ไป','bpai'],['โรง','roong'],['พยาบาล','phá-yaa-baan']], pol:1},
+  {id:'lost',      g:'help', en:'I\'m lost',                     w:[['{I}',''],['หลง','lǒng'],['ทาง','thaang']], pol:1},
+  {id:'allergic',  g:'help', en:'I\'m allergic to …',            w:[['{I}',''],['แพ้','pháe'],['…','…']], pol:1},
+  {id:'doctor',    g:'help', en:'I need a doctor',              w:[['{I}',''],['ต้องการ','dtâawng-gaan'],['หมอ','mǎaw']], pol:1},
+];
+
+
 </script>
 <script>
 const DATA=[
@@ -430,13 +562,14 @@ function geom(ch){
 let thVoice=null;
 function pickVoice(){const vs=speechSynthesis.getVoices();thVoice=vs.find(v=>/^th(-|_|$)/i.test(v.lang))||null;return thVoice}
 if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 function speak(text,rate){
-  const msg=$('#voiceMsg');
-  if(!('speechSynthesis' in window)){msg.hidden=false;msg.textContent="This browser can't speak. Try Chrome on your phone.";return}
+  const msg={set hidden(v){document.querySelectorAll('.voicemsg').forEach(m=>m.hidden=v)},set textContent(t){document.querySelectorAll('.voicemsg').forEach(m=>m.textContent=t)}};
+  if(!('speechSynthesis' in window)){msg.hidden=false;msg.textContent="This browser can't speak. Try Chrome on Android or Safari on iPhone.";return}
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);u.lang='th-TH';u.rate=rate;if(pickVoice())u.voice=thVoice;
   speechSynthesis.speak(u);
-  if(!thVoice){msg.hidden=false;msg.textContent="No Thai voice found on this device. On Android: Settings › Text-to-speech output › Google › install Thai, then reload."}
+  if(!thVoice){msg.hidden=false;msg.textContent=isIOS?"No Thai voice found. On iPhone: Settings › Accessibility › Spoken Content › Voices › Thai, then reopen the app.":"No Thai voice found on this device. On Android: Settings › Text-to-speech output › Google › install Thai, then reload."}
   else msg.hidden=true;
 }
 
@@ -461,7 +594,7 @@ function renderIndex(){
 }
 function renderNotes(){
   const ks=Object.keys(flags);
-  $('#notesText').textContent=ks.length?ks.map(k=>{const r=DATA.find(d=>d[0]===k);return `${k} (${r[1]}): ${flags[k]||'flagged, no note'}`}).join('\n'):'Nothing flagged yet.';
+  $('#notesText').textContent=ks.length?ks.map(k=>{if(k.startsWith('p:')){const ph=PHRASES.find(x=>'p:'+x.id===k);return `Phrase "${ph?ph.en:k}": ${flags[k]||'flagged, no note'}`}const r=DATA.find(d=>d[0]===k);return `${k} (${r[1]}): ${flags[k]||'flagged, no note'}`}).join('\n'):'Nothing flagged yet.';
   $('#copyNotes').hidden=!ks.length;
 }
 $('#copyNotes').onclick=e=>{const t=$('#notesText').textContent;
@@ -472,7 +605,7 @@ $('#copyNotes').onclick=e=>{const t=$('#notesText').textContent;
 let cur=0, mode='watch';
 function openLetter(i){
   cur=(i+DATA.length)%DATA.length;
-  $('#vIndex').hidden=true;$('#vBoard').hidden=true;$('#vLetter').hidden=false;$('#lnav').hidden=false;
+  setView('vLetter');
   try{history.replaceState(null,'','#l'+cur)}catch(e){}
   const r=DATA[cur],c=CLS[r[4]];
   $('#lBig').textContent=r[0];$('#lBig').style.color=c.color;
@@ -487,7 +620,13 @@ function openLetter(i){
 }
 $('#prev').onclick=()=>openLetter(cur-1);
 $('#next').onclick=()=>openLetter(cur+1);
-const goHome=()=>{stopWatch();$('#vLetter').hidden=true;$('#vBoard').hidden=true;$('#vIndex').hidden=false;$('#lnav').hidden=true;try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
+function setView(v){
+  for(const id of ['vIndex','vLetter','vBoard','vPhrases'])$('#'+id).hidden=id!==v;
+  $('#lnav').hidden=v!=='vLetter';
+  const tab={vIndex:'letters',vLetter:'letters',vPhrases:'phrases',vBoard:'board'}[v];
+  document.querySelectorAll('.tabbar button').forEach(b=>b.dataset.v===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+}
+const goHome=()=>{stopWatch();setView('vIndex');try{history.replaceState(null,'','#')}catch(e){}renderIndex()};
 $('#home').onclick=goHome;
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderScore()});$('#grid').onclick=goHome;
 $('#sayName').onclick=()=>speak(sname(DATA[cur]),0.85);
@@ -711,7 +850,7 @@ async function flush(){
     }}finally{flushing=false}
 }
 addEventListener('online',flush);
-function openBoard(){stopWatch();$('#vIndex').hidden=true;$('#vLetter').hidden=true;$('#lnav').hidden=true;$('#vBoard').hidden=false;try{history.replaceState(null,'','#board')}catch(e){}window.scrollTo({top:0});renderBoard()}
+function openBoard(){stopWatch();setView('vBoard');try{history.replaceState(null,'','#board')}catch(e){}window.scrollTo({top:0});renderBoard()}
 async function renderBoard(){
   $('#boardJoin').hidden=!!me;
   document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===boardPeriod));
@@ -738,10 +877,96 @@ $('#joinForm').onsubmit=async e=>{e.preventDefault();
   finally{$('#joinBtn').disabled=false}
 };
 
+/* ---------- phrasebook ---------- */
+let spk=store.get('spk','m'),favs=store.get('favs',{}),pgroup=store.get('pgroup','basics');
+const phraseInk=makeInk();
+function phraseWords(ph){
+  const out=[];
+  for(const [th,rom] of ph.w){
+    if(th==='{I}')out.push(spk==='f'?['ฉัน','chǎn','auto']:['ผม','phǒm','auto']);
+    else out.push([th,rom,th==='…'?'blank':'']);
+  }
+  if(ph.pol)out.push(spk==='f'?(ph.q?['คะ','khá','auto']:['ค่ะ','khâ','auto']):['ครับ','khráp','auto']);
+  return out;
+}
+const phraseText=ph=>phraseWords(ph).filter(w=>w[2]!=='blank').map(w=>w[0]).join('');
+function openPhrases(){stopWatch();setView('vPhrases');try{history.replaceState(null,'','#phrases')}catch(e){}window.scrollTo({top:0});renderPhrases()}
+function renderPhrases(){
+  document.querySelectorAll('.spk .seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===spk));
+  const chips=$('#pgChips');chips.innerHTML='';
+  for(const [id,name] of [['fav','★ Favourites'],...PHRASE_GROUPS]){
+    const b=el('button',{'aria-pressed':String(pgroup===id)});b.textContent=name;
+    b.onclick=()=>{pgroup=id;store.set('pgroup',id);renderPhrases()};chips.append(b)}
+  const list=$('#pList');list.innerHTML='';
+  const items=PHRASES.filter(ph=>pgroup==='fav'?favs[ph.id]:ph.g===pgroup);
+  if(!items.length){list.append(el('p',{class:'small'},'No favourites yet. Tap ☆ on any phrase to keep it here.'));return}
+  for(const ph of items)list.append(phraseCard(ph));
+}
+function phraseCard(ph){
+  const card=el('div',{class:'pcard'}),words=phraseWords(ph);
+  const th=el('div',{class:'pth',lang:'th'});
+  for(const [t,rom,kind] of words){
+    const w=el('span',{class:'w'+(kind?' '+kind:'')});w.textContent=t;
+    if(kind!=='blank'){w.setAttribute('role','button');w.setAttribute('tabindex','0');w.setAttribute('aria-label',`Play ${rom}`);
+      w.onclick=()=>speak(t,0.75);w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();speak(t,0.75)}}}
+    th.append(w)}
+  const rom=el('div',{class:'prom'});rom.textContent=words.map(w=>w[1]).join(' ');
+  const en=el('div',{class:'pen'});en.textContent=ph.en;
+  const act=el('div',{class:'pact'});
+  const fav=el('button',{class:'btn fav','aria-pressed':String(!!favs[ph.id]),'aria-label':'Favourite'},favs[ph.id]?'★':'☆');
+  fav.onclick=()=>{if(favs[ph.id])delete favs[ph.id];else favs[ph.id]=1;store.set('favs',favs);fav.setAttribute('aria-pressed',String(!!favs[ph.id]));fav.textContent=favs[ph.id]?'★':'☆';if(pgroup==='fav')renderPhrases()};
+  act.append(btn('▶ Play',()=>speak(phraseText(ph),0.85),'pri'),btn('Slowly',()=>speak(phraseText(ph),0.5)),btn('✎ Write it',()=>toggleWrite(card,ph)),fav);
+  // letters in this phrase you can open
+  const seen=new Set(),let_=el('div',{class:'plet'});
+  for(const ch of phraseText(ph)){const i=DATA.findIndex(r=>r[0]===ch);if(i<0||seen.has(ch))continue;seen.add(ch);
+    const b=el('button',{'aria-label':`Open letter ${DATA[i][1]}`});b.textContent=ch;b.onclick=()=>openLetter(i);let_.append(b)}
+  if(seen.size)let_.prepend(Object.assign(el('span'),{textContent:'Letters:'}));
+  // "sounds wrong?" note, collected with the stroke notes
+  const key='p:'+ph.id,fl=el('div',{class:'pflag'});
+  const fb=el('button');fb.textContent=key in flags?'Sounds wrong? (noted)':'Sounds wrong?';
+  const ta=el('textarea',{placeholder:'What sounds or reads wrong?','aria-label':'What sounds wrong'});ta.hidden=!(key in flags);ta.value=flags[key]||'';
+  fb.onclick=()=>{ta.hidden=!ta.hidden;if(!ta.hidden){flags[key]=flags[key]||'';store.set('flags',flags);fb.textContent='Sounds wrong? (noted)';ta.focus()}};
+  ta.oninput=()=>{flags[key]=ta.value;store.set('flags',flags)};
+  fl.append(fb,ta);
+  const pad=el('div',{class:'ppad'});pad.hidden=true;
+  card.append(th,rom,en,act,let_,pad,fl);
+  return card;
+}
+/* Write it: the phrase as faded guide letters on a wide pad (free copying, not scored yet). */
+function toggleWrite(card,ph){
+  const pad=card.querySelector('.ppad');
+  document.querySelectorAll('.ppad').forEach(x=>{if(x!==pad){x.hidden=true;x.innerHTML=''}});
+  document.querySelectorAll('.ppadtools').forEach(t=>{if(t.previousElementSibling!==pad)t.remove()});
+  if(!pad.hidden){pad.hidden=true;pad.innerHTML='';card.querySelectorAll('.ppadtools').forEach(t=>t.remove());return}
+  pad.hidden=false;
+  const W=pad.clientWidth||320,text=phraseText(ph);
+  const m=document.createElement('canvas').getContext('2d');m.font='100px Sarabun';
+  // biggest letter size that fits the phrase in one or two lines (wrapping between words)
+  const wordsTh=phraseWords(ph).filter(w=>w[2]!=='blank').map(w=>w[0]);
+  const wrap=F=>{const out=[];let line='';for(const t of wordsTh){const tryL=line+t;if(line&&m.measureText(tryL).width*F/100>W*0.92){out.push(line);line=t}else line=tryL}out.push(line);return out};
+  let F=48,lines=wrap(48);
+  for(let f=110;f>=48;f-=4){const L=wrap(f);if(L.length<=2&&L.every(l=>m.measureText(l).width*f/100<=W*0.92)){F=f;lines=L;break}}
+  const lineH=F*1.45,H=Math.round(lines.length*lineH+F*0.35);
+  pad.style.height=H+'px';
+  const dpr=Math.min(3,devicePixelRatio||1),bg=document.createElement('canvas');bg.width=W*dpr;bg.height=H*dpr;
+  const g=bg.getContext('2d');g.scale(dpr,dpr);const css=getComputedStyle(document.documentElement);
+  lines.forEach((l,i)=>{const base=F*1.05+i*lineH;
+    g.strokeStyle=css.getPropertyValue('--line');g.lineWidth=1;g.beginPath();g.moveTo(8,base+0.5);g.lineTo(W-8,base+0.5);g.stroke();
+    g.fillStyle=css.getPropertyValue('--line-strong');g.globalAlpha=0.55;g.font=F+'px Sarabun';g.textAlign='center';g.fillText(l,W/2,base);g.globalAlpha=1});
+  const cv=document.createElement('canvas');
+  const tools=el('div',{class:'ppadtools'});
+  tools.append(btn('Clear',()=>phraseInk.clear()),btn('Done',()=>{pad.hidden=true;pad.innerHTML='';tools.remove()}));
+  card.querySelectorAll('.ppadtools').forEach(t=>t.remove());
+  pad.append(bg,cv);pad.after(tools);
+  phraseInk.attach(cv,true,{w:W*100/F,h:H*100/F,onChange:()=>{}});
+}
+document.querySelectorAll('.spk .seg button').forEach(b=>b.onclick=()=>{spk=b.dataset.s;store.set('spk',spk);renderPhrases()});
+document.querySelectorAll('.tabbar button').forEach(b=>b.onclick=()=>({letters:goHome,phrases:openPhrases,board:openBoard})[b.dataset.v]());
+
 /* ---------- boot ---------- */
-renderScore();renderIndex();flush();
+renderScore();renderIndex();flush();setView('vIndex');
 const m=/^#l(\d+)$/.exec(location.hash);
-const boot=()=>{if(location.hash==='#board')openBoard();else if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
+const boot=()=>{if(location.hash==='#board')openBoard();else if(location.hash==='#phrases')openPhrases();else if(m)openLetter(+m[1]);else if(!store.get('seen',0)){store.set('seen',1);openLetter(0)}};
 (document.fonts?document.fonts.load('100px Sarabun','กขค'):Promise.resolve()).then(boot,boot);
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'))</script></body></html>

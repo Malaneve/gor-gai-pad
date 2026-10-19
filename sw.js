@@ -1,8 +1,8 @@
 // Offline support for Gor Gai Pad.
 // The app itself is cached on install; Google Fonts are cached the first time they load.
 // Bump VERSION whenever index.html changes so phones pick up the new build.
-const VERSION = 'ggp-20261019161455';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const VERSION = 'ggp-20261019163240';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
